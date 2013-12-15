@@ -120,12 +120,14 @@ public class MainFrame extends javax.swing.JFrame {
         }
         delete.setEnabled(entries.length > 0);
         if (cert == null) {
+            serialNumber.setText("");
             subject.setText("");
             issuer.setText("");
             startDate.setText("-");
             endDate.setText("-");
             sshEncode.setEnabled(false);
         } else {
+            serialNumber.setText(cert.getSerialNumber().toString());
             subject.setText(formatDN(cert.getSubjectDN().getName()));
             issuer.setText(formatDN(cert.getIssuerDN().getName()));
             startDate.setText(cert.getNotBefore() == null ? "-"
@@ -209,6 +211,8 @@ public class MainFrame extends javax.swing.JFrame {
         java.awt.GridBagConstraints gridBagConstraints;
 
         infoPanel = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        serialNumber = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         subject = new javax.swing.JTextArea();
         jLabel2 = new javax.swing.JLabel();
@@ -254,14 +258,27 @@ public class MainFrame extends javax.swing.JFrame {
 
         infoPanel.setLayout(new java.awt.GridBagLayout());
 
+        jLabel4.setText("Serial number:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(12, 12, 0, 11);
+        infoPanel.add(jLabel4, gridBagConstraints);
+
+        serialNumber.setText("-");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(12, 0, 0, 11);
+        infoPanel.add(serialNumber, gridBagConstraints);
+
         jLabel1.setText("Subject:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        gridBagConstraints.insets = new java.awt.Insets(12, 12, 0, 11);
+        gridBagConstraints.insets = new java.awt.Insets(11, 12, 0, 11);
         infoPanel.add(jLabel1, gridBagConstraints);
 
-        subject.setColumns(32);
         subject.setEditable(false);
+        subject.setColumns(32);
         subject.setRows(5);
         subject.setMinimumSize(new java.awt.Dimension(256, 90));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -775,6 +792,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JList list;
@@ -787,6 +805,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JButton saveButton;
     private javax.swing.JMenuItem saveStoreAsItem;
     private javax.swing.JMenuItem saveStoreItem;
+    private javax.swing.JLabel serialNumber;
     private javax.swing.JButton signButton;
     private javax.swing.JMenuItem signItem;
     private javax.swing.JMenuItem sshEncode;
