@@ -1,0 +1,8 @@
+V0.12:
+    - in SSH encoding dialog, add the alias as a comment
+
+V0.11:
+    - Updated the comments in the source files
+
+V0.10:
+    - Dealt with the issue of the reversed attributes of X500 names
