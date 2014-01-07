@@ -53,13 +53,13 @@ public class ImportDialog extends JDialog {
     private static final int CHOOSER_PAGE = 0;
     private static final int LIST_PAGE    = 1;
 
-    private KeyStore keystore;
+    private final KeyStore keystore;
     private int currentPage = -1;
     private boolean done;
     private KeyPair keys;
     private X509Certificate certs[];
-    private ImportTableModel model = new ImportTableModel();
-    private Configuration conf;
+    private final ImportTableModel model = new ImportTableModel();
+    private final Configuration conf;
 
     public ImportDialog(JFrame parent, Configuration conf, KeyStore keystore) {
         super(parent, true);
@@ -275,15 +275,7 @@ public class ImportDialog extends JDialog {
             X509Certificate cert = certs[i];
             String alias = keystore.getCertificateAlias(cert);
             if (alias == null) {
-                alias = cert.getSubjectDN().toString();
-                int eqpos = alias.indexOf('=');
-                if (eqpos >= 0) {
-                    int start = eqpos+1;
-                    int cmpos = alias.indexOf(',', start);
-                    alias = cmpos < 0
-                            ? alias.substring(start)
-                            : alias.substring(start, cmpos);
-                }
+                alias = cert.getSubjectDN().getName();
                 model.add(new CertificateEntry(alias, cert));
             }
         }
