@@ -38,7 +38,7 @@ import javax.swing.JTextField;
 public class SignDialog extends JDialog {
     private final DateFormat dateFormat
             = new SimpleDateFormat("dd-MM-yyyy");
-    private KeyStore keystore;
+    private final KeyStore keystore;
     private boolean done;
 
     public SignDialog(Frame parent, KeyStore keystore, KeyStoreEntry current)
