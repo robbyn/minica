@@ -121,6 +121,7 @@ public class MainFrame extends javax.swing.JFrame {
         delete.setEnabled(entries.length > 0);
         if (cert == null) {
             serialNumber.setText("");
+            serialNumberHex.setText("");
             subject.setText("");
             issuer.setText("");
             startDate.setText("-");
@@ -128,6 +129,7 @@ public class MainFrame extends javax.swing.JFrame {
             sshEncode.setEnabled(false);
         } else {
             serialNumber.setText(cert.getSerialNumber().toString());
+            serialNumberHex.setText(cert.getSerialNumber().toString(16));
             subject.setText(formatDN(cert.getSubjectDN().getName()));
             issuer.setText(formatDN(cert.getIssuerDN().getName()));
             startDate.setText(cert.getNotBefore() == null ? "-"
@@ -213,6 +215,7 @@ public class MainFrame extends javax.swing.JFrame {
         infoPanel = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         serialNumber = new javax.swing.JLabel();
+        serialNumberHex = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         subject = new javax.swing.JTextArea();
         jLabel2 = new javax.swing.JLabel();
@@ -270,6 +273,13 @@ public class MainFrame extends javax.swing.JFrame {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(12, 0, 0, 11);
         infoPanel.add(serialNumber, gridBagConstraints);
+
+        serialNumberHex.setText("-");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        infoPanel.add(serialNumberHex, gridBagConstraints);
 
         jLabel1.setText("Subject:");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -806,6 +816,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem saveStoreAsItem;
     private javax.swing.JMenuItem saveStoreItem;
     private javax.swing.JLabel serialNumber;
+    private javax.swing.JLabel serialNumberHex;
     private javax.swing.JButton signButton;
     private javax.swing.JMenuItem signItem;
     private javax.swing.JMenuItem sshEncode;
