@@ -93,10 +93,16 @@
 
     <target name="zip-all" depends="zip-bin,zip-src"/>
 
-    <target name="exe" depends="clean,jar" if="launch4j.dir">
+    <target name="exe" depends="clean,jar,exewdir,exewodir"/>
+
+    <target name="exewdir" if="launch4j.dir">
         <taskdef name="launch4j"
                 classname="net.sf.launch4j.ant.Launch4jTask"
                 classpath="${launch4j.dir}/launch4j.jar:${launch4j.dir}/lib/xstream.jar" />
         <launch4j configFile="launch4j.xml" />
+    </target>
+
+    <target name="exewodir" unless="launch4j.dir">
+        <echo message="Cannot build EXE file: missing property launch4j.dir"/>
     </target>
 </project>
