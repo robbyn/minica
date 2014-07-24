@@ -105,8 +105,8 @@
     <target name="exewodir" unless="launch4j.dir">
         <echo level="error">
     Cannot build EXE file: missing property launch4j.dir.
-    Please install launch4j from http://launch4j.sourceforge.net/ and
-    add the launch4j.dir property in nbproject/private/private.properties or in
+    Please install launch4j from http://launch4j.sourceforge.net/ and set the
+    launch4j.dir property in nbproject/private/private.properties or in
     ${user.properties.file}
         </echo>
     </target>
