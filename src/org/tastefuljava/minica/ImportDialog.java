@@ -328,7 +328,7 @@ public class ImportDialog extends JDialog {
                 chooser.getSelectedFile().getAbsolutePath());
     }
 
-    // <editor-fold defaultstate="collapsed" desc=" Generated Code ">//GEN-BEGIN:initComponents
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
@@ -350,17 +350,18 @@ public class ImportDialog extends JDialog {
         cancel = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+
         cardPanel.setLayout(new java.awt.CardLayout());
 
         chooserPanel.setLayout(new java.awt.GridBagLayout());
 
+        chooser.setAcceptAllFileFilterUsed(false);
         chooser.setControlButtonsAreShown(false);
         chooser.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
             public void propertyChange(java.beans.PropertyChangeEvent evt) {
                 chooserPropertyChange(evt);
             }
         });
-
         chooserPanel.add(chooser, new java.awt.GridBagConstraints());
 
         cardPanel.add(chooserPanel, "chooser-page");
@@ -375,7 +376,7 @@ public class ImportDialog extends JDialog {
         listPanel.add(jLabel1, gridBagConstraints);
 
         listScroll.setPreferredSize(new java.awt.Dimension(454, 250));
-        listScroll.setViewport(null);
+
         table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -403,7 +404,6 @@ public class ImportDialog extends JDialog {
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.insets = new java.awt.Insets(11, 12, 0, 11);
         passwordPanel.add(jLabel2, gridBagConstraints);
-
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.ipadx = 120;
@@ -421,16 +421,15 @@ public class ImportDialog extends JDialog {
 
         bottomPanel.setLayout(new java.awt.BorderLayout());
 
+        buttonPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(17, 12, 11, 11));
         buttonPanel.setLayout(new java.awt.GridLayout(1, 0, 5, 0));
 
-        buttonPanel.setBorder(javax.swing.BorderFactory.createEmptyBorder(17, 12, 11, 11));
         back.setText("< Back");
         back.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 backActionPerformed(evt);
             }
         });
-
         buttonPanel.add(back);
 
         next.setText("Next >");
@@ -439,7 +438,6 @@ public class ImportDialog extends JDialog {
                 nextActionPerformed(evt);
             }
         });
-
         buttonPanel.add(next);
 
         ok.setText("OK");
@@ -448,7 +446,6 @@ public class ImportDialog extends JDialog {
                 okActionPerformed(evt);
             }
         });
-
         buttonPanel.add(ok);
 
         cancel.setText("Cancel");
@@ -457,7 +454,6 @@ public class ImportDialog extends JDialog {
                 cancelActionPerformed(evt);
             }
         });
-
         buttonPanel.add(cancel);
 
         bottomPanel.add(buttonPanel, java.awt.BorderLayout.EAST);

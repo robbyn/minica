@@ -42,6 +42,7 @@
           <SubComponents>
             <Component class="javax.swing.JFileChooser" name="chooser">
               <Properties>
+                <Property name="acceptAllFileFilterUsed" type="boolean" value="false"/>
                 <Property name="controlButtonsAreShown" type="boolean" value="false"/>
               </Properties>
               <Events>
