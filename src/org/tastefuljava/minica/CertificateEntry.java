@@ -22,7 +22,7 @@ import java.security.KeyStoreException;
 import java.security.cert.X509Certificate;
 
 public class CertificateEntry extends KeyStoreEntry {
-    private X509Certificate cert;
+    private final X509Certificate cert;
 
     public CertificateEntry(String alias, X509Certificate cert) {
         super(alias, false);

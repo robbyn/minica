@@ -39,7 +39,7 @@ public class Configuration implements Serializable {
 
     private static final DecimalFormat NUMBER_FORMAT;
 
-    private Properties props = new Properties();
+    private final Properties props = new Properties();
 
     public Configuration() {
     }
@@ -57,13 +57,10 @@ public class Configuration implements Serializable {
     }
 
     public void load(File file) throws IOException {
-        props = new Properties();
+        props.clear();
         if (file.exists()) {
-            InputStream in = new FileInputStream(file);
-            try {
+            try (InputStream in = new FileInputStream(file)) {
                 props.load(in);
-            } finally {
-                in.close();
             }
         }
     }
@@ -75,11 +72,8 @@ public class Configuration implements Serializable {
 
 
     public void store(File file) throws IOException {
-        OutputStream out = new FileOutputStream(file);
-        try {
+        try (OutputStream out = new FileOutputStream(file)) {
             props.store(out, "configuration");
-        } finally {
-            out.close();
         }
     }
 
