@@ -19,22 +19,29 @@ package org.tastefuljava.minica;
 
 import java.awt.Frame;
 import java.awt.Rectangle;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.security.auth.x500.X500Principal;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import org.bouncycastle.operator.OperatorCreationException;
 
 public class GenerateKeyDialog extends JDialog {
     private final DateFormat dateFormat
@@ -559,7 +566,9 @@ public class GenerateKeyDialog extends JDialog {
                         = (SignatureAlgorithm)signatureAlg.getSelectedItem();
                 gen.setSignatureAlgorithm(alg.name());
                 gen.setIssuer(ic.getSubjectX500Principal(), issuerKey);
-             } catch (Exception ex) {
+             } catch (RuntimeException | KeyStoreException
+                     | NoSuchAlgorithmException
+                     | UnrecoverableKeyException ex) {
                 JOptionPane.showMessageDialog(this, ex.getMessage(), "Error",
                         JOptionPane.ERROR_MESSAGE);
                 return;
@@ -584,9 +593,11 @@ public class GenerateKeyDialog extends JDialog {
                     chain[++ix] = c;
                 }
             }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Signature error",
-                    "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (RuntimeException | OperatorCreationException
+                | CertificateException | IOException
+                | NoSuchAlgorithmException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(),
+                    "Signature Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
         done = true;
