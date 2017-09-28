@@ -42,8 +42,8 @@ import org.bouncycastle.openssl.PEMWriter;
  * @author  PERRYM
  */
 public class ExportDialog extends JDialog {
-    private KeyStore keystore;
-    private Configuration conf;
+    private final KeyStore keystore;
+    private final Configuration conf;
     private boolean done;
 
     public ExportDialog(Frame parent, Configuration conf, KeyStore keystore,
@@ -57,18 +57,23 @@ public class ExportDialog extends JDialog {
                 ? new File(".") : new File(s).getParentFile();
         String name = current.getAlias();
         String format = conf.getString("export.format", "pem");
-        if (format.equals("pem")) {
-            pem.setSelected(true);
-            name += ".pem";
-        } else if (format.equals("pkcs12")) {
-            pkcs12.setSelected(true);
-            name += ".p12";
-        } else if (format.equals("jks")) {
-            jks.setSelected(true);
-            name += ".jks";
-        } else {
-            der.setSelected(true);
-            name += ".der";
+        switch (format) {
+            case "pem":
+                pem.setSelected(true);
+                name += ".pem";
+                break;
+            case "pkcs12":
+                pkcs12.setSelected(true);
+                name += ".p12";
+                break;
+            case "jks":
+                jks.setSelected(true);
+                name += ".jks";
+                break;
+            default:
+                der.setSelected(true);
+                name += ".der";
+                break;
         }
         File f = new File(dir, name);
         file.setText(f.getCanonicalPath());
@@ -119,54 +124,49 @@ public class ExportDialog extends JDialog {
     private void doExport() {
         KeyStoreEntry entry = (KeyStoreEntry)alias.getSelectedItem();
         File outFile = new File(file.getText());
-        try {
-            OutputStream out = new FileOutputStream(outFile);
-            try {
-                char pwd[] = {};
-                Key key = null;
-                if (exportKey.isSelected()) {
-                    pwd = password.getPassword();
-                    key = keystore.getKey(entry.getAlias(), pwd);
-                    pwd = outPassword.getPassword();
-                    char ver[] = verification.getPassword();
-                    if (!new String(pwd).equals(new String(ver))) {
-                        throw new Exception("Output password and verification "
-                                + "are different");
-                    }
+        try (OutputStream out = new FileOutputStream(outFile)) {
+            char pwd[] = {};
+            Key key = null;
+            if (exportKey.isSelected()) {
+                pwd = password.getPassword();
+                key = keystore.getKey(entry.getAlias(), pwd);
+                pwd = outPassword.getPassword();
+                char ver[] = verification.getPassword();
+                if (!new String(pwd).equals(new String(ver))) {
+                    throw new Exception("Output password and verification "
+                            + "are different");
                 }
-                Certificate cert = null;
-                Certificate chain[] = null;
-                if (exportChain.isSelected()) {
-                    chain = keystore.getCertificateChain(
-                            entry.getAlias());
-                } else if (exportCert.isSelected()) {
-                    cert = keystore.getCertificate(
-                            entry.getAlias());
-                }
-
-                if (pem.isSelected()) {
-                    exportPem(out, key, cert, chain, pwd);
-                    conf.setString("export.format", "pem");
-                } else if (pkcs12.isSelected()) {
-                    exportPkcs12(out, entry.getAlias(), key, cert, chain, pwd);
-                    conf.setString("export.format", "pkcs12");
-                } else if (jks.isSelected()) {
-                    exportJks(out, entry.getAlias(), key, cert, chain, pwd);
-                    conf.setString("export.format", "jks");
-                } else if (der.isSelected()) {
-                    exportDer(out, entry.getAlias(), key, cert, chain, pwd);
-                    conf.setString("export.format", "der");
-                }
-                conf.setString("export.file", file.getText());
-                done = true;
-            } finally {
-                out.close();
             }
+            Certificate cert = null;
+            Certificate chain[] = null;
+            if (exportChain.isSelected()) {
+                chain = keystore.getCertificateChain(
+                        entry.getAlias());
+            } else if (exportCert.isSelected()) {
+                cert = keystore.getCertificate(
+                        entry.getAlias());
+            }
+
+            if (pem.isSelected()) {
+                exportPem(out, key, cert, chain, pwd);
+                conf.setString("export.format", "pem");
+            } else if (pkcs12.isSelected()) {
+                exportPkcs12(out, entry.getAlias(), key, cert, chain, pwd);
+                conf.setString("export.format", "pkcs12");
+            } else if (jks.isSelected()) {
+                exportJks(out, entry.getAlias(), key, cert, chain, pwd);
+                conf.setString("export.format", "jks");
+            } else if (der.isSelected()) {
+                exportDer(out, entry.getAlias(), key, cert, chain, pwd);
+                conf.setString("export.format", "der");
+            }
+            conf.setString("export.file", file.getText());
+            done = true;
         } catch (Exception e) {
+            done = false;
             JOptionPane.showMessageDialog(getParent(),
                     "Error while exporting to " + outFile, "Error",
                     JOptionPane.ERROR_MESSAGE);
-            done = false;
         }
     }
 

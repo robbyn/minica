@@ -42,7 +42,7 @@ public class GenerateKeyDialog extends JDialog {
     private boolean done;
     private PrivateKey privateKey;
     private Certificate[] chain;
-    private KeyStore keystore;
+    private final KeyStore keystore;
 
     public GenerateKeyDialog(Frame parent, KeyStore keystore)
             throws KeyStoreException {
