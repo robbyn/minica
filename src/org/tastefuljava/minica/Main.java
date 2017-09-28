@@ -20,6 +20,7 @@ package org.tastefuljava.minica;
 import java.security.Security;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class Main {

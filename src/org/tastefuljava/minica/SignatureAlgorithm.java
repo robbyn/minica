@@ -24,7 +24,8 @@ public enum SignatureAlgorithm {
     SHA1withRSA("SHA1", "RSA"),
     MD2withRSA("MD2", "RSA"),
     MD5withRSA("MD5", "RSA"),
-    SHA1withDSA("SHA1", "DSA");
+    SHA1withDSA("SHA1", "DSA"),
+    SHA256withRSA("SHA256", "RSA");
 
     private String digest;
     private String crypto;
