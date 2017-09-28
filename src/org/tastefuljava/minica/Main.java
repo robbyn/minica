@@ -17,11 +17,10 @@
 */
 package org.tastefuljava.minica;
 
-import java.security.Security;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class Main {
     private static final Logger LOG
@@ -29,9 +28,10 @@ public class Main {
 
     public static void main(String[] args) {
         try {
-            Security.addProvider(new BouncyCastleProvider());
             new MainFrame().setVisible(true);
-        } catch (Exception e) {
+        } catch (IOException e) {
+            LOG.log(Level.SEVERE, "Exception in main", e);
+        } catch (GeneralSecurityException e) {
             LOG.log(Level.SEVERE, "Exception in main", e);
         }
     }
