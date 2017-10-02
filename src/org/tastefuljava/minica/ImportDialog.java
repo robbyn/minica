@@ -32,17 +32,27 @@ import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.TableCellEditor;
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
+import org.bouncycastle.openssl.PEMDecryptorProvider;
+import org.bouncycastle.openssl.PEMEncryptedKeyPair;
+import org.bouncycastle.openssl.PEMKeyPair;
 import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
 
 public class ImportDialog extends JDialog {
     private static final String PAGES[] = {"chooser-page", "list-page"};
@@ -152,8 +162,6 @@ public class ImportDialog extends JDialog {
     private void loadPem(File file) throws IOException {
         Reader reader = new FileReader(file);
         try {
-            PasswordDialog dlg = new PasswordDialog(this,
-                    "Enter password for" + file);
             PEMParser in = new PEMParser(reader);
             Object obj = in.readObject();
             if (obj == null) {
@@ -163,18 +171,33 @@ public class ImportDialog extends JDialog {
                 }
             }
             keys = null;
-            if (obj instanceof KeyPair) {
-                keys = (KeyPair)obj;
+            JcaX509CertificateConverter cconv = new JcaX509CertificateConverter();
+            JcaPEMKeyConverter converter = new JcaPEMKeyConverter().setProvider("BC");
+            if (obj instanceof PEMEncryptedKeyPair) {
+                // Encrypted key - we will use provided password
+                PasswordDialog dlg = new PasswordDialog(this,
+                        "Enter password for" + file);
+                char[] pwd = dlg.getPassword();
+                if (pwd != null) {
+                    PEMDecryptorProvider decProv = new JcePEMDecryptorProviderBuilder().build(pwd);
+                    keys = converter.getKeyPair(((PEMEncryptedKeyPair) obj).decryptKeyPair(decProv));
+                }
+                obj = in.readObject();
+            } else if (obj instanceof PEMKeyPair) {
+                // Unencrypted key - no password needed
+                keys = converter.getKeyPair((PEMKeyPair) obj);
                 obj = in.readObject();
             }
             List<X509Certificate> list = new ArrayList<X509Certificate>();
             while (obj != null) {
-                if (obj instanceof X509Certificate) {
-                    list.add((X509Certificate)obj);
+                if (obj instanceof X509CertificateHolder) {
+                    list.add(cconv.getCertificate((X509CertificateHolder)obj));
                 }
                 obj = in.readObject();
             }
             certs = list.toArray(new X509Certificate[list.size()]);
+        } catch (CertificateException ex) {
+            Logger.getLogger(ImportDialog.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             reader.close();
         }

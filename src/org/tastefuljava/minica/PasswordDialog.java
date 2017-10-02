@@ -20,9 +20,8 @@ package org.tastefuljava.minica;
 import java.awt.Rectangle;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
-import org.bouncycastle.openssl.PasswordFinder;
 
-public class PasswordDialog extends JDialog implements PasswordFinder {
+public class PasswordDialog extends JDialog {
     boolean done;
 
     public PasswordDialog(JFrame parent, String title) {
