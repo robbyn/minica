@@ -14,7 +14,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 package org.tastefuljava.minica;
 
 import java.awt.CardLayout;
@@ -55,13 +55,14 @@ import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
 
 public class ImportDialog extends JDialog {
+
     private static final String PAGES[] = {"chooser-page", "list-page"};
 
     private static final int FIRST_PAGE = 0;
-    private static final int LAST_PAGE  = PAGES.length-1;
+    private static final int LAST_PAGE = PAGES.length - 1;
 
     private static final int CHOOSER_PAGE = 0;
-    private static final int LIST_PAGE    = 1;
+    private static final int LIST_PAGE = 1;
 
     private final KeyStore keystore;
     private int currentPage = -1;
@@ -134,7 +135,7 @@ public class ImportDialog extends JDialog {
                     } catch (Exception e) {
                         JOptionPane.showMessageDialog(this,
                                 "Error while importing file "
-                                        + chooser.getSelectedFile(), "Error",
+                                + chooser.getSelectedFile(), "Error",
                                 JOptionPane.ERROR_MESSAGE);
                         return;
                     }
@@ -142,20 +143,20 @@ public class ImportDialog extends JDialog {
                 break;
         }
         currentPage = newPage;
-        CardLayout layout = (CardLayout)cardPanel.getLayout();
+        CardLayout layout = (CardLayout) cardPanel.getLayout();
         layout.show(cardPanel, PAGES[currentPage]);
         setButtonStatus();
     }
 
     private void nextPage() {
         if (currentPage < LAST_PAGE) {
-            setCurrentPage(currentPage+1);
+            setCurrentPage(currentPage + 1);
         }
     }
 
     private void prevPage() {
         if (currentPage > FIRST_PAGE) {
-            setCurrentPage(currentPage-1);
+            setCurrentPage(currentPage - 1);
         }
     }
 
@@ -191,13 +192,13 @@ public class ImportDialog extends JDialog {
             List<X509Certificate> list = new ArrayList<X509Certificate>();
             while (obj != null) {
                 if (obj instanceof X509CertificateHolder) {
-                    list.add(cconv.getCertificate((X509CertificateHolder)obj));
+                    list.add(cconv.getCertificate((X509CertificateHolder) obj));
                 }
                 obj = in.readObject();
             }
             certs = list.toArray(new X509Certificate[list.size()]);
         } catch (CertificateException ex) {
-            Logger.getLogger(ImportDialog.class.getName()).log(Level.SEVERE, null, ex);
+            throw new IOException(ex.getMessage());
         } finally {
             reader.close();
         }
@@ -243,17 +244,17 @@ public class ImportDialog extends JDialog {
             KeyStore store = KeyStore.getInstance(type);
             store.load(in, pwd);
             for (Enumeration<String> enm = store.aliases();
-                    enm.hasMoreElements(); ) {
+                    enm.hasMoreElements();) {
                 String alias = enm.nextElement();
                 if (store.entryInstanceOf(alias,
                         KeyStore.PrivateKeyEntry.class)) {
                     keys = new KeyPair(store.getCertificate(alias).getPublicKey(),
-                            (PrivateKey)store.getKey(alias, pwd));
+                            (PrivateKey) store.getKey(alias, pwd));
                     Certificate chain[] = store.getCertificateChain(alias);
                     if (chain != null) {
-                        for (Certificate cert: chain) {
+                        for (Certificate cert : chain) {
                             if (cert instanceof X509Certificate) {
-                                certificates.add((X509Certificate)cert);
+                                certificates.add((X509Certificate) cert);
                             }
                         }
                     }
@@ -265,7 +266,7 @@ public class ImportDialog extends JDialog {
                     Certificate cert = store.getCertificate(alias);
                     if (cert != null) {
                         if (cert instanceof X509Certificate) {
-                            certificates.add((X509Certificate)cert);
+                            certificates.add((X509Certificate) cert);
                         }
                     }
                 } else {
