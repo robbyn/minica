@@ -53,7 +53,6 @@ import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
 import org.bouncycastle.openssl.jcajce.JcePEMDecryptorProviderBuilder;
 
 public class ImportDialog extends JDialog {
-
     private static final String PAGES[] = {"chooser-page", "list-page"};
 
     private static final int FIRST_PAGE = 0;
