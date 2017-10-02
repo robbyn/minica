@@ -39,8 +39,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -132,7 +130,7 @@ public class ImportDialog extends JDialog {
                             loadCert(chooser.getSelectedFile());
                         }
                         fillTable();
-                    } catch (Exception e) {
+                    } catch (IOException | GeneralSecurityException e) {
                         JOptionPane.showMessageDialog(this,
                                 "Error while importing file "
                                 + chooser.getSelectedFile(), "Error",
@@ -189,7 +187,7 @@ public class ImportDialog extends JDialog {
                 keys = converter.getKeyPair((PEMKeyPair) obj);
                 obj = in.readObject();
             }
-            List<X509Certificate> list = new ArrayList<X509Certificate>();
+            List<X509Certificate> list = new ArrayList<>();
             while (obj != null) {
                 if (obj instanceof X509CertificateHolder) {
                     list.add(cconv.getCertificate((X509CertificateHolder) obj));
@@ -240,7 +238,7 @@ public class ImportDialog extends JDialog {
         }
         InputStream in = new FileInputStream(file);
         try {
-            List<X509Certificate> certificates = new ArrayList<X509Certificate>();
+            List<X509Certificate> certificates = new ArrayList<>();
             KeyStore store = KeyStore.getInstance(type);
             store.load(in, pwd);
             for (Enumeration<String> enm = store.aliases();
