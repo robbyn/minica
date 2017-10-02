@@ -21,11 +21,14 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -36,6 +39,7 @@ import org.bouncycastle.asn1.x509.BasicConstraints;
 import org.bouncycastle.asn1.x509.X509Extension;
 import org.bouncycastle.cert.X509CertificateHolder;
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder;
+import org.bouncycastle.jce.spec.ECParameterSpec;
 import org.bouncycastle.operator.ContentSigner;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
@@ -53,6 +57,7 @@ public class X509CertificateBuilder {
     private X500Principal issuer;
     private PrivateKey issuerKey;
     private int basicConstraints = Integer.MAX_VALUE;
+    private ECParameterSpec ecSpec;
 
     public X509CertificateBuilder(BigInteger sn, X500Principal principal) {
         this.sn = sn;
@@ -88,6 +93,11 @@ public class X509CertificateBuilder {
         this.keySize = keySize;
     }
 
+    public void setAlgorithm(String algorithm, ECParameterSpec ecSpec) {
+        this.algorithm = algorithm;
+        this.ecSpec = ecSpec;
+    }
+
     public void setIssuer(X500Principal issuer, PrivateKey issuerKey) {
         this.issuer = issuer;
         this.issuerKey = issuerKey;
@@ -103,9 +113,10 @@ public class X509CertificateBuilder {
 
     public X509Certificate build()
             throws OperatorCreationException, CertificateException,
-            IOException, NoSuchAlgorithmException {
+            IOException, NoSuchAlgorithmException, NoSuchProviderException,
+            InvalidAlgorithmParameterException {
         if (publicKey == null) {
-            KeyPair pair = generateKeyPair(algorithm, keySize);
+            KeyPair pair = generateKeyPair();
             publicKey = pair.getPublic();
             privateKey = pair.getPrivate();
         }
@@ -131,11 +142,25 @@ public class X509CertificateBuilder {
         return decode(certHolder.getEncoded());
     }
 
-    private static KeyPair generateKeyPair(String algorithm, int keySize)
-            throws NoSuchAlgorithmException {
-        KeyPairGenerator gen = KeyPairGenerator.getInstance(algorithm);
-        gen.initialize(keySize);
+    private KeyPair generateKeyPair()
+            throws NoSuchAlgorithmException, NoSuchProviderException,
+            InvalidAlgorithmParameterException {
+        KeyPairGenerator gen = getKeyPairGenerator();
         return gen.generateKeyPair();
+    }
+
+    private KeyPairGenerator getKeyPairGenerator()
+            throws NoSuchAlgorithmException, NoSuchProviderException,
+            InvalidAlgorithmParameterException {
+        KeyPairGenerator gen;
+        if ("ECDSA".equals(algorithm) && ecSpec != null) {
+            gen = KeyPairGenerator.getInstance("ECDSA", "BC");
+            gen.initialize(ecSpec, new SecureRandom());
+        } else {
+            gen = KeyPairGenerator.getInstance(algorithm);
+            gen.initialize(keySize, new SecureRandom());
+        }
+        return gen;
     }
 
     public static X509Certificate decode(byte[] data)
@@ -163,5 +188,9 @@ public class X509CertificateBuilder {
         cal.setTime(date);
         cal.add(Calendar.YEAR, count);
         return cal.getTime();
+    }
+
+    public void setECSpec(ECParameterSpec ecSpec) {
+        this.ecSpec = ecSpec;
     }
 }

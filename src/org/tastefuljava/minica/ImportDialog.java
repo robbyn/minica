@@ -42,7 +42,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.table.TableCellEditor;
-import org.bouncycastle.openssl.PEMReader;
+import org.bouncycastle.openssl.PEMParser;
 
 public class ImportDialog extends JDialog {
     private static final String PAGES[] = {"chooser-page", "list-page"};
@@ -154,7 +154,7 @@ public class ImportDialog extends JDialog {
         try {
             PasswordDialog dlg = new PasswordDialog(this,
                     "Enter password for" + file);
-            PEMReader in = new PEMReader(reader, dlg);
+            PEMParser in = new PEMParser(reader);
             Object obj = in.readObject();
             if (obj == null) {
                 // Some PEM files have garbarge at the top

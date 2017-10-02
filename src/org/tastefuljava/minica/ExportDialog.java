@@ -35,7 +35,9 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.bouncycastle.openssl.PEMEncryptor;
 import org.bouncycastle.openssl.PEMWriter;
+import org.bouncycastle.openssl.jcajce.JcePEMEncryptorBuilder;
 
 /**
  *
@@ -176,8 +178,10 @@ public class ExportDialog extends JDialog {
         PEMWriter out = new PEMWriter(new OutputStreamWriter(stream, "UTF-8"));
         if (key != null) {
             if (pwd.length > 0)  {
-                out.writeObject(key, "DESEDE", pwd,
-                        SecureRandom.getInstance("SHA1PRNG"));
+                JcePEMEncryptorBuilder builder = new JcePEMEncryptorBuilder("DES-EDE3-CBC");
+                builder.setSecureRandom(SecureRandom.getInstance("SHA1PRNG"));
+                PEMEncryptor pemEncryptor = builder.build(pwd);
+                out.writeObject(key, pemEncryptor);
             } else {
                 out.writeObject(key);
             }

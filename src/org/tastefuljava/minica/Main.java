@@ -22,8 +22,14 @@ import java.security.GeneralSecurityException;
 import java.security.Provider;
 import java.security.Provider.Service;
 import java.security.Security;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.bouncycastle.asn1.x9.ECNamedCurveTable;
+import org.bouncycastle.crypto.ec.CustomNamedCurves;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 public class Main {
@@ -40,9 +46,28 @@ public class Main {
                             + s.getType() + ": "+ s.getAlgorithm());
                 }
             }
+            System.out.println("Curves:");
+            List<String> names = makeList(ECNamedCurveTable.getNames());
+            for (String name: names) {
+                System.out.println("    " + name);
+            }
+            System.out.println("Custom curves:");
+            names = makeList(CustomNamedCurves.getNames());
+            for (String name: names) {
+                System.out.println("    " + name);
+            }
             new MainFrame().setVisible(true);
         } catch (IOException | GeneralSecurityException e) {
             LOG.log(Level.SEVERE, "Exception in main", e);
         }
+    }
+
+    private static List<String> makeList(Enumeration<String> enm) {
+        List<String> names = new ArrayList<>();
+        while (enm.hasMoreElements()) {
+            names.add(enm.nextElement());
+        }
+        Collections.sort(names);
+        return names;
     }
 }

@@ -17,13 +17,16 @@
 */
 package org.tastefuljava.minica;
 
+import java.awt.CardLayout;
 import java.awt.Frame;
 import java.awt.Rectangle;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
@@ -34,6 +37,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Enumeration;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.security.auth.x500.X500Principal;
@@ -41,6 +47,11 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import org.bouncycastle.asn1.x9.X9ECParameters;
+import org.bouncycastle.crypto.ec.CustomNamedCurves;
+import org.bouncycastle.jce.ECNamedCurveTable;
+import org.bouncycastle.jce.spec.ECParameterSpec;
+import org.bouncycastle.math.ec.ECCurve;
 import org.bouncycastle.operator.OperatorCreationException;
 
 public class GenerateKeyDialog extends JDialog {
@@ -90,6 +101,19 @@ public class GenerateKeyDialog extends JDialog {
         cal.add(Calendar.YEAR, 1);
         endDate.setText(dateFormat.format(cal.getTime()));
         getRootPane().setDefaultButton(ok);
+        ec.removeAllItems();
+        Set<String> curves = new TreeSet<>();
+        for (Enumeration<String> enm = ECNamedCurveTable.getNames();
+                enm.hasMoreElements(); ) {
+            curves.add(enm.nextElement());
+        }
+        for (Enumeration<String> enm = CustomNamedCurves.getNames();
+                enm.hasMoreElements(); ) {
+            curves.add(enm.nextElement());
+        }
+        for (String curve: curves) {
+            ec.addItem(curve);
+        }
         pack();
         Rectangle rc = parent.getBounds();
         int x = Math.max(rc.x + (rc.width-getWidth())/2, 0);
@@ -140,7 +164,13 @@ public class GenerateKeyDialog extends JDialog {
         serialNumber = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         algorithm = new javax.swing.JComboBox();
+        algorithmParams = new javax.swing.JPanel();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel18 = new javax.swing.JLabel();
         keySize = new javax.swing.JTextField();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel19 = new javax.swing.JLabel();
+        ec = new javax.swing.JComboBox<>();
         jLabel12 = new javax.swing.JLabel();
         startDate = new javax.swing.JTextField();
         endDate = new javax.swing.JTextField();
@@ -229,7 +259,7 @@ public class GenerateKeyDialog extends JDialog {
         gridBagConstraints.insets = new java.awt.Insets(5, 0, 0, 11);
         leftPanel.add(serialNumber, gridBagConstraints);
 
-        jLabel4.setText("Algorithm/key size:");
+        jLabel4.setText("Algorithm:");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(11, 12, 0, 11);
@@ -242,9 +272,20 @@ public class GenerateKeyDialog extends JDialog {
             }
         });
         gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
         gridBagConstraints.insets = new java.awt.Insets(11, 0, 0, 11);
         leftPanel.add(algorithm, gridBagConstraints);
+
+        algorithmParams.setLayout(new java.awt.CardLayout());
+
+        jPanel2.setLayout(new java.awt.GridBagLayout());
+
+        jLabel18.setText("Key size:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 11);
+        jPanel2.add(jLabel18, gridBagConstraints);
 
         keySize.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         keySize.setText("1024");
@@ -252,8 +293,33 @@ public class GenerateKeyDialog extends JDialog {
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.ipadx = 40;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
-        gridBagConstraints.insets = new java.awt.Insets(11, 0, 0, 11);
-        leftPanel.add(keySize, gridBagConstraints);
+        jPanel2.add(keySize, gridBagConstraints);
+
+        algorithmParams.add(jPanel2, "default");
+
+        jPanel1.setLayout(new java.awt.GridBagLayout());
+
+        jLabel19.setText("Elliptic curve:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new java.awt.Insets(0, 0, 0, 11);
+        jPanel1.add(jLabel19, gridBagConstraints);
+
+        ec.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        ec.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ecActionPerformed(evt);
+            }
+        });
+        jPanel1.add(ec, new java.awt.GridBagConstraints());
+
+        algorithmParams.add(jPanel1, "EC");
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(5, 0, 11, 11);
+        leftPanel.add(algorithmParams, gridBagConstraints);
 
         jLabel12.setText("Start/end date:");
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -530,7 +596,16 @@ public class GenerateKeyDialog extends JDialog {
             keySize.requestFocus();
             return;
         }
-        gen.setAlgorithm(alg.getCrypto(), ksize);
+        if (alg != null && "ECDSA".equals(alg.getCrypto())) {
+            String curve = (String)ec.getSelectedItem();
+            if (curve != null) {
+                ECParameterSpec ecSpec
+                        = ECNamedCurveTable.getParameterSpec(curve);
+                gen.setAlgorithm(curve, ecSpec);
+            }
+        } else {
+            gen.setAlgorithm(alg.getCrypto(), ksize);
+        }
         gen.setSignatureAlgorithm(alg.name());
 
         try {
@@ -595,7 +670,8 @@ public class GenerateKeyDialog extends JDialog {
             }
         } catch (RuntimeException | OperatorCreationException
                 | CertificateException | IOException
-                | NoSuchAlgorithmException e) {
+                | NoSuchAlgorithmException | NoSuchProviderException
+                | InvalidAlgorithmParameterException e) {
             JOptionPane.showMessageDialog(this, e.getMessage(),
                     "Signature Error", JOptionPane.ERROR_MESSAGE);
             return;
@@ -633,8 +709,18 @@ public class GenerateKeyDialog extends JDialog {
     }//GEN-LAST:event_signerActionPerformed
 
     private void algorithmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_algorithmActionPerformed
-
+        SignatureAlgorithm alg = (SignatureAlgorithm)algorithm.getSelectedItem();
+        CardLayout layout = (CardLayout)algorithmParams.getLayout();
+        if (alg != null && "ECDSA".equals(alg.getCrypto())) {
+            layout.show(algorithmParams, "EC");
+        } else {
+            layout.show(algorithmParams, "default");
+        }
     }//GEN-LAST:event_algorithmActionPerformed
+
+    private void ecActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ecActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ecActionPerformed
 
     private static void addField(String name, JTextField field,
             X500PrincipalBuilder nb) {
@@ -655,6 +741,7 @@ public class GenerateKeyDialog extends JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox algorithm;
+    private javax.swing.JPanel algorithmParams;
     private javax.swing.JTextField alias;
     private javax.swing.JRadioButton autoSigned;
     private javax.swing.JPanel bottomPanel;
@@ -662,6 +749,7 @@ public class GenerateKeyDialog extends JDialog {
     private javax.swing.JButton cancel;
     private javax.swing.JTextField commonName;
     private javax.swing.JTextField country;
+    private javax.swing.JComboBox<String> ec;
     private javax.swing.JTextField endDate;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -672,6 +760,8 @@ public class GenerateKeyDialog extends JDialog {
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel16;
     private javax.swing.JLabel jLabel17;
+    private javax.swing.JLabel jLabel18;
+    private javax.swing.JLabel jLabel19;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -680,6 +770,8 @@ public class GenerateKeyDialog extends JDialog {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JTextField keySize;
     private javax.swing.JPanel leftPanel;
     private javax.swing.JTextField locality;
