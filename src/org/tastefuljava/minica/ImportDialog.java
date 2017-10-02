@@ -158,8 +158,7 @@ public class ImportDialog extends JDialog {
     }
 
     private void loadPem(File file) throws IOException {
-        Reader reader = new FileReader(file);
-        try {
+        try (Reader reader = new FileReader(file)) {
             PEMParser in = new PEMParser(reader);
             Object obj = in.readObject();
             if (obj == null) {
@@ -196,8 +195,6 @@ public class ImportDialog extends JDialog {
             certs = list.toArray(new X509Certificate[list.size()]);
         } catch (CertificateException ex) {
             throw new IOException(ex.getMessage());
-        } finally {
-            reader.close();
         }
     }
 
