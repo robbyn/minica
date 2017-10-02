@@ -45,9 +45,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import org.bouncycastle.asn1.x9.ECNamedCurveTable;
-import org.bouncycastle.asn1.x9.X9ECParameters;
-import org.bouncycastle.crypto.ec.CustomNamedCurves;
+import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.spec.ECParameterSpec;
 import org.bouncycastle.operator.OperatorCreationException;
 
@@ -101,10 +99,6 @@ public class GenerateKeyDialog extends JDialog {
         ec.removeAllItems();
         Set<String> curves = new TreeSet<>();
         for (Enumeration<String> enm = ECNamedCurveTable.getNames();
-                enm.hasMoreElements(); ) {
-            curves.add(enm.nextElement());
-        }
-        for (Enumeration<String> enm = CustomNamedCurves.getNames();
                 enm.hasMoreElements(); ) {
             curves.add(enm.nextElement());
         }
@@ -596,12 +590,7 @@ public class GenerateKeyDialog extends JDialog {
         if ("ECDSA".equals(alg.getCrypto())) {
             String curve = (String)ec.getSelectedItem();
             if (curve != null) {
-                X9ECParameters parms = ECNamedCurveTable.getByName(curve);
-                if (parms == null) {
-                    parms = CustomNamedCurves.getByName(curve);
-                }
-                ECParameterSpec ecSpec = new ECParameterSpec(parms.getCurve(),
-                        parms.getG(), parms.getN(), parms.getH());
+                ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(curve);
                 gen.setAlgorithm(alg.getCrypto(), ecSpec);
             }
         } else {
