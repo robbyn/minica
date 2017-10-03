@@ -67,7 +67,7 @@ public class GenerateKeyDialog extends JDialog {
         for (int i = 0; i < algs.length; ++i) {
             algorithm.addItem(algs[i]);
         }
-        algorithm.setSelectedIndex(0);
+        algorithm.setSelectedItem(SignatureAlgorithm.SHA256withRSA);
         signer.setRenderer(new KeyStoreEntryRenderer());
         signer.removeAllItems();
         KeyStoreEntry entries[] = KeyStoreEntry.getAll(keystore);
@@ -279,7 +279,7 @@ public class GenerateKeyDialog extends JDialog {
         jPanel2.add(jLabel18, gridBagConstraints);
 
         keySize.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        keySize.setText("1024");
+        keySize.setText("2048");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.ipadx = 40;
