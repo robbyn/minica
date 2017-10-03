@@ -161,12 +161,19 @@ public class MainFrame extends javax.swing.JFrame {
             if (keystoreFile != null) {
                 chooser.setSelectedFile(keystoreFile);
             }
+            File dir = new File(conf.getString("keystore.dir",
+                    System.getProperty("user.home")));
+            if (dir.isDirectory()) {
+                chooser.setCurrentDirectory(dir);
+            }
             chooser.setDialogTitle("Save keystore");
             if (JFileChooser.APPROVE_OPTION == chooser.showSaveDialog(this)) {
                 file = chooser.getSelectedFile();
                 if (file.getName().toLowerCase().indexOf('.') < 0) {
                     file = new File(file.getParentFile(),
                             file.getName() + ".jks");
+                    conf.setString("keystore.dir",
+                            file.getParentFile().getAbsolutePath());
                 }
             } else {
                 return false;
@@ -703,6 +710,11 @@ public class MainFrame extends javax.swing.JFrame {
         if (keystoreFile != null) {
             chooser.setSelectedFile(keystoreFile);
         }
+        File dir = new File(conf.getString("keystore.dir",
+                System.getProperty("user.home")));
+        if (dir.isDirectory()) {
+            chooser.setCurrentDirectory(dir);
+        }
         chooser.setDialogTitle("Open keystore");
         if (JFileChooser.APPROVE_OPTION == chooser.showOpenDialog(this)) {
             File file = chooser.getSelectedFile();
@@ -720,6 +732,8 @@ public class MainFrame extends javax.swing.JFrame {
                 }
                 keystore = ks;
                 keystoreFile = file;
+                conf.setString("keystore.dir",
+                        file.getParentFile().getAbsolutePath());
                 keystoreChanged();
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this, "Could not open file "
