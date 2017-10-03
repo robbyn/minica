@@ -54,7 +54,7 @@ public class KeyStoreEntry {
 
     private static KeyStoreEntry[] getAll(KeyStore keystore, boolean keys,
             boolean certs) throws KeyStoreException {
-        List<KeyStoreEntry> entries = new ArrayList<KeyStoreEntry>();
+        List<KeyStoreEntry> entries = new ArrayList<>();
         for (Enumeration enm = keystore.aliases(); enm.hasMoreElements(); ) {
             String alias = (String)enm.nextElement();
             boolean key = keystore.isKeyEntry(alias);

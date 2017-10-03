@@ -41,14 +41,14 @@ import javax.swing.filechooser.FileFilter;
 import org.bouncycastle.asn1.x500.X500Name;
 
 public class MainFrame extends javax.swing.JFrame {
-    private static DateFormat dateFormat
+    private static final DateFormat dateFormat
             = new SimpleDateFormat("dd-MM-yyyy");
     private KeyStore keystore;
     private File keystoreFile;
     private boolean changed;
-    private File confFile = new File(System.getProperty("user.home"),
+    private final File confFile = new File(System.getProperty("user.home"),
             "minica.properties");
-    private Configuration conf = new Configuration(confFile);
+    private final Configuration conf = new Configuration(confFile);
 
     public MainFrame() throws IOException, GeneralSecurityException {
         initComponents();
@@ -149,10 +149,12 @@ public class MainFrame extends javax.swing.JFrame {
         if (chooseFile || file == null) {
             JFileChooser chooser = new JFileChooser();
             chooser.addChoosableFileFilter(new FileFilter() {
+                @Override
                 public String getDescription() {
                     return "Keystore files (*.jks)";
                 }
 
+                @Override
                 public boolean accept(File file) {
                     return file.isDirectory() || file.isFile()
                             && file.getName().toLowerCase().endsWith(".jks");
