@@ -74,8 +74,7 @@ public class GenerateKeyDialog extends JDialog {
         signer.removeAllItems();
         KeyStoreEntry entries[] = KeyStoreEntry.getAll(keystore);
         Arrays.sort(entries, KeyStoreEntry.TYPE_ALIAS_ORDER);
-        for (int i = 0; i < entries.length; ++i) {
-            KeyStoreEntry entry = entries[i];
+        for (KeyStoreEntry entry: entries) {
             if (entry.isKey()) {
                 Certificate[] certs = keystore.getCertificateChain(
                         entry.getAlias());
@@ -108,6 +107,17 @@ public class GenerateKeyDialog extends JDialog {
             ec.addItem(curve);
         }
         loadSomeFields();
+        BigInteger limit = BigInteger.valueOf(10000);
+        BigInteger maxSn = BigInteger.ZERO;
+        for (KeyStoreEntry entry: entries) {
+            X509Certificate ic = (X509Certificate)keystore.getCertificate(
+                    entry.getAlias());
+            BigInteger sn = ic.getSerialNumber();
+            if (sn.compareTo(limit) < 0 && sn.compareTo(maxSn) > 0) {
+                maxSn = sn;
+            }
+        }
+        serialNumber.setText(maxSn.add(BigInteger.ONE).toString());
         pack();
         Rectangle rc = parent.getBounds();
         int x = Math.max(rc.x + (rc.width-getWidth())/2, 0);
