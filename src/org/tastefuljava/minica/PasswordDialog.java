@@ -120,18 +120,6 @@ public class PasswordDialog extends JDialog {
         done = true;
         dispose();
     }//GEN-LAST:event_okActionPerformed
-    
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new PasswordDialog(new javax.swing.JFrame(), "Please enter password").setVisible(true);
-            }
-        });
-    }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bottomPanel;
     private javax.swing.JButton cancel;

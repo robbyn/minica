@@ -64,6 +64,10 @@ public class GenerateKeyDialog extends JDialog {
         this.conf = conf;
         this.keystore = keystore;
         initComponents();
+        init(keystore, parent);
+    }
+
+    private void init(KeyStore keystore1, Frame parent) throws KeyStoreException {
         algorithm.removeAllItems();
         SignatureAlgorithm algs[] = SignatureAlgorithm.values();
         for (int i = 0; i < algs.length; ++i) {
@@ -72,12 +76,11 @@ public class GenerateKeyDialog extends JDialog {
         algorithm.setSelectedItem(SignatureAlgorithm.SHA256withRSA);
         signer.setRenderer(new KeyStoreEntryRenderer());
         signer.removeAllItems();
-        KeyStoreEntry entries[] = KeyStoreEntry.getAll(keystore);
+        KeyStoreEntry[] entries = KeyStoreEntry.getAll(keystore1);
         Arrays.sort(entries, KeyStoreEntry.TYPE_ALIAS_ORDER);
-        for (KeyStoreEntry entry: entries) {
+        for (KeyStoreEntry entry : entries) {
             if (entry.isKey()) {
-                Certificate[] certs = keystore.getCertificateChain(
-                        entry.getAlias());
+                Certificate[] certs = keystore1.getCertificateChain(entry.getAlias());
                 X509Certificate ic = (X509Certificate)certs[0];
                 if (ic.getBasicConstraints() >= 0) {
                     signer.addItem(entry);
@@ -109,9 +112,8 @@ public class GenerateKeyDialog extends JDialog {
         loadSomeFields();
         BigInteger limit = BigInteger.valueOf(10000);
         BigInteger maxSn = BigInteger.ZERO;
-        for (KeyStoreEntry entry: entries) {
-            X509Certificate ic = (X509Certificate)keystore.getCertificate(
-                    entry.getAlias());
+        for (KeyStoreEntry entry : entries) {
+            X509Certificate ic = (X509Certificate) keystore1.getCertificate(entry.getAlias());
             BigInteger sn = ic.getSerialNumber();
             if (sn.compareTo(limit) < 0 && sn.compareTo(maxSn) > 0) {
                 maxSn = sn;

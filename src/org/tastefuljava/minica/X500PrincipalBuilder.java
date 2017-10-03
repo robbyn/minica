@@ -20,7 +20,7 @@ package org.tastefuljava.minica;
 import javax.security.auth.x500.X500Principal;
 
 public class X500PrincipalBuilder {
-    private StringBuilder buf = new StringBuilder();
+    private final StringBuilder buf = new StringBuilder();
 
     public void add(String attr, String value) {
         if (buf.length() > 0) {

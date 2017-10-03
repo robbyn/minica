@@ -52,6 +52,10 @@ public class MainFrame extends javax.swing.JFrame {
 
     public MainFrame() throws IOException, GeneralSecurityException {
         initComponents();
+        init();
+    }
+
+    private void init() throws IOException, GeneralSecurityException {
         list.setCellRenderer(new KeyStoreEntryRenderer());
         keystore = KeyStore.getInstance("JKS");
         keystore.load(null, null);
@@ -112,7 +116,7 @@ public class MainFrame extends javax.swing.JFrame {
             try {
                 cert = (X509Certificate)keystore.getCertificate(
                         entry.getAlias());
-            } catch (Exception e) {
+            } catch (KeyStoreException e) {
                 JOptionPane.showMessageDialog(this,
                         "Invalid certificate in keystore", "Error",
                         JOptionPane.ERROR_MESSAGE);
@@ -194,19 +198,16 @@ public class MainFrame extends javax.swing.JFrame {
                     }
                     file.renameTo(backup);
                 }
-                OutputStream out = new FileOutputStream(file);
-                try {
+                try (OutputStream out = new FileOutputStream(file)) {
                     keystore.store(out, pwd);
-                } finally {
-                    out.close();
                 }
                 keystoreFile = file;
                 keystoreChanged();
                 return true;
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Error while saving the keystore "
-                        + keystoreFile, "Error",
-                        JOptionPane.ERROR_MESSAGE);
+            } catch (IOException | GeneralSecurityException e) {
+                JOptionPane.showMessageDialog(this,
+                        "Error while saving the keystore " + keystoreFile,
+                        "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
         return false;
@@ -582,7 +583,7 @@ public class MainFrame extends javax.swing.JFrame {
         conf.setInt("frame.height", getHeight());
         try {
             conf.store();
-        } catch (Exception e) {
+        } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Could not save configuration "
                     + confFile, "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -603,7 +604,7 @@ public class MainFrame extends javax.swing.JFrame {
                 conf.store();
                 keystoreChanged();
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Error during import",
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -634,7 +635,7 @@ public class MainFrame extends javax.swing.JFrame {
                     conf.store();
                 }
             }
-        } catch (Exception e) {
+        } catch (IOException | KeyStoreException e) {
             JOptionPane.showMessageDialog(this, "Error during export",
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -700,10 +701,12 @@ public class MainFrame extends javax.swing.JFrame {
         }
         JFileChooser chooser = new JFileChooser();
         chooser.addChoosableFileFilter(new FileFilter() {
+            @Override
             public String getDescription() {
                 return "Keystore files (*.jks)";
             }
 
+            @Override
             public boolean accept(File file) {
                 return file.isDirectory() || file.isFile()
                         && file.getName().toLowerCase().endsWith(".jks");
@@ -726,18 +729,15 @@ public class MainFrame extends javax.swing.JFrame {
                     type = "PKCS12";
                 }
                 KeyStore ks = KeyStore.getInstance(type);
-                InputStream in = new FileInputStream(file);
-                try {
+                try (InputStream in = new FileInputStream(file)) {
                     ks.load(in, null);
-                } finally {
-                    in.close();
                 }
                 keystore = ks;
                 keystoreFile = file;
                 conf.setString("keystore.dir",
                         file.getParentFile().getAbsolutePath());
                 keystoreChanged();
-            } catch (Exception e) {
+            } catch (IOException | GeneralSecurityException e) {
                 JOptionPane.showMessageDialog(this, "Could not open file "
                         + chooser.getSelectedFile(), "Error",
                         JOptionPane.ERROR_MESSAGE);
@@ -754,7 +754,7 @@ public class MainFrame extends javax.swing.JFrame {
             keystore = KeyStore.getInstance("JKS");
             keystore.load(null, null);
             keystoreChanged();
-        } catch (Exception e) {
+        } catch (IOException | GeneralSecurityException e) {
             JOptionPane.showMessageDialog(this, "Could create keystore",
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -778,7 +778,7 @@ public class MainFrame extends javax.swing.JFrame {
                     model.remove(list.getSelectedIndex());
                 }
             }
-        } catch (Exception e) {
+        } catch (GeneralSecurityException e) {
             JOptionPane.showMessageDialog(this, "Could create keystore",
                     "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -794,7 +794,7 @@ public class MainFrame extends javax.swing.JFrame {
                 String encoded = SSHEncoding.encode(pub, entry.getAlias());
                 SSHEncodingDialog.doDialog(this, encoded);
             }
-        } catch (Exception e) {
+        } catch (GeneralSecurityException e) {
             JOptionPane.showMessageDialog(this,
                     "Invalid certificate in keystore", "Error",
                     JOptionPane.ERROR_MESSAGE);

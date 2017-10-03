@@ -29,8 +29,8 @@ public class KeyStoreEntry {
     public static final Comparator<KeyStoreEntry> TYPE_ALIAS_ORDER;
     public static final Comparator<KeyStoreEntry> ALIAS_ORDER;
 
-    private String alias;
-    private boolean key;
+    private final String alias;
+    private final boolean key;
 
     public KeyStoreEntry(String alias, boolean key) {
         this.alias = alias;
@@ -102,6 +102,7 @@ public class KeyStoreEntry {
 
     static {
         TYPE_ALIAS_ORDER = new Comparator<KeyStoreEntry>() {
+            @Override
             public int compare(KeyStoreEntry e1, KeyStoreEntry e2) {
                 if (e1 == e2) {
                     return 0;
@@ -122,6 +123,7 @@ public class KeyStoreEntry {
         };
 
         ALIAS_ORDER = new Comparator<KeyStoreEntry>() {
+            @Override
             public int compare(KeyStoreEntry e1, KeyStoreEntry e2) {
                 if (e1 == e2) {
                     return 0;

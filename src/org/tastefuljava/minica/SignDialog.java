@@ -19,11 +19,16 @@ package org.tastefuljava.minica;
 
 import java.awt.Frame;
 import java.awt.Rectangle;
+import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -34,6 +39,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import org.bouncycastle.operator.OperatorCreationException;
 
 public class SignDialog extends JDialog {
     private final DateFormat dateFormat
@@ -46,14 +52,17 @@ public class SignDialog extends JDialog {
         super(parent, true);
         this.keystore = keystore;
         initComponents();
+        init(keystore, current, parent);
+    }
+
+    private void init(KeyStore keystore1, KeyStoreEntry current, Frame parent) throws KeyStoreException {
         Util.clearWidthAll(this, JTextField.class);
         Util.clearWidthAll(this, JPasswordField.class);
         int textHeight = startDate.getPreferredSize().height;
         Util.adjustHeight(subjectPassword, textHeight);
         Util.adjustHeight(signerPassword, textHeight);
-
         // fill subject and signer comboboxes
-        KeyStoreEntry entries[] = KeyStoreEntry.getAll(keystore);
+        KeyStoreEntry[] entries = KeyStoreEntry.getAll(keystore1);
         Arrays.sort(entries, KeyStoreEntry.TYPE_ALIAS_ORDER);
         subject.setRenderer(new KeyStoreEntryRenderer());
         signer.setRenderer(new KeyStoreEntryRenderer());
@@ -247,17 +256,14 @@ public class SignDialog extends JDialog {
         KeyStoreEntry subj = (KeyStoreEntry)subject.getSelectedItem();
         char subjpwd[] = null;
         PrivateKey subjkey = null;
-        X509Certificate cert = null;
+        X509Certificate cert;
         try {
             if (subj.isKey()) {
                 subjpwd = subjectPassword.getPassword();
                 subjkey = (PrivateKey)keystore.getKey(subj.getAlias(), subjpwd);
-                cert = (X509Certificate)keystore.getCertificateChain(
-                        subj.getAlias())[0];
-            } else {
-                cert = (X509Certificate)keystore.getCertificate(
-                        subj.getAlias());
             }
+            cert = (X509Certificate)keystore.getCertificate(
+                    subj.getAlias());
         } catch (GeneralSecurityException e) {
             JOptionPane.showMessageDialog(this, "Could not retrieve the "
                     + "subject's key. Please check the subject password",
@@ -307,9 +313,11 @@ public class SignDialog extends JDialog {
 
         try {
             cert = gen.build();
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, "Signature error", "Error",
-                    JOptionPane.ERROR_MESSAGE);
+        } catch (IOException | InvalidAlgorithmParameterException
+                | NoSuchAlgorithmException | NoSuchProviderException
+                | CertificateException | OperatorCreationException e) {
+            JOptionPane.showMessageDialog(this, "Signature error",
+                    e.getMessage(), JOptionPane.ERROR_MESSAGE);
             return;
         }
 

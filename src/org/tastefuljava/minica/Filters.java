@@ -28,10 +28,12 @@ class Filters {
 
     static {
         PEM_FILEFILTER = new FileFilter() {
+            @Override
             public String getDescription() {
                 return "OpenSSL/OpenSSH files (*.pem)";
             }
 
+            @Override
             public boolean accept(File file) {
                 return file.isDirectory() || file.isFile()
                         && file.getName().toLowerCase().endsWith(".pem");
@@ -39,10 +41,12 @@ class Filters {
         };
 
         PKCS12_FILEFILTER = new FileFilter() {
+            @Override
             public String getDescription() {
                 return "PKCS12 files (*.p12)";
             }
 
+            @Override
             public boolean accept(File file) {
                 return file.isDirectory() || file.isFile()
                         && file.getName().toLowerCase().endsWith(".p12");
@@ -50,10 +54,12 @@ class Filters {
         };
 
         JKS_FILEFILTER = new FileFilter() {
+            @Override
             public String getDescription() {
                 return "JKS files (*.jks)";
             }
 
+            @Override
             public boolean accept(File file) {
                 return file.isDirectory() || file.isFile()
                         && file.getName().toLowerCase().endsWith(".jks");
@@ -61,10 +67,12 @@ class Filters {
         };
 
         CERT_FILEFILTER = new FileFilter() {
+            @Override
             public String getDescription() {
                 return "X509 certificate files (*.crt,*.cer,*.der)";
             }
 
+            @Override
             public boolean accept(File file) {
                 if (file.isDirectory()) {
                     return true;

@@ -45,8 +45,8 @@ import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 
 public class X509CertificateBuilder {
-    private BigInteger sn;
-    private X500Principal principal;
+    private final BigInteger sn;
+    private final X500Principal principal;
     private Date start = today();
     private Date end = addYears(start, 2);
     private String algorithm = "RSA";
@@ -166,11 +166,8 @@ public class X509CertificateBuilder {
     public static X509Certificate decode(byte[] data)
             throws CertificateException, IOException {
         CertificateFactory factory = CertificateFactory.getInstance("X.509");
-        InputStream in = new ByteArrayInputStream(data);
-        try {
+        try (InputStream in = new ByteArrayInputStream(data)) {
             return (X509Certificate)factory.generateCertificate(in);
-        } finally {
-            in.close();
         }
     }
 

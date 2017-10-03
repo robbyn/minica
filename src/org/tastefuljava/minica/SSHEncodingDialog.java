@@ -27,13 +27,17 @@ public class SSHEncodingDialog extends JDialog {
     private SSHEncodingDialog(Frame parent, String text) {
         super(parent, true);
         initComponents();
+        init(parent, text);
+    }
+
+    private void init(Frame parent, String text1) {
         getRootPane().setDefaultButton(ok);
         pack();
         Rectangle rc = parent.getBounds();
         int x = Math.max(rc.x + (rc.width-getWidth())/2, 0);
         int y = Math.max(rc.y + (rc.height-getHeight())/2, 0);
         setLocation(x, y);
-        this.text.setText(text);
+        text.setText(text1);
     }
 
     public static void doDialog(Frame parent, String text) {

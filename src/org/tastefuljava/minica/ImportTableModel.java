@@ -23,7 +23,7 @@ import javax.swing.table.AbstractTableModel;
 
 
 public class ImportTableModel extends AbstractTableModel {
-    private List<KeyStoreEntry> entries = new ArrayList<KeyStoreEntry>();
+    private final List<KeyStoreEntry> entries = new ArrayList<>();
 
     public ImportTableModel() {
     }
@@ -42,10 +42,12 @@ public class ImportTableModel extends AbstractTableModel {
         fireTableRowsInserted(ix, ix);
     }
 
+    @Override
     public int getRowCount() {
         return entries.size();
     }
 
+    @Override
     public int getColumnCount() {
         return 1;
     }
@@ -65,6 +67,7 @@ public class ImportTableModel extends AbstractTableModel {
         }
     }
 
+    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         return entries.get(rowIndex);
     }

@@ -28,8 +28,8 @@ public enum SignatureAlgorithm {
     SHA256withRSA("SHA256", "RSA"),
     SHA256withECDSA("SHA256", "ECDSA");
 
-    private String digest;
-    private String crypto;
+    private final String digest;
+    private final String crypto;
 
     private SignatureAlgorithm(String digest, String crypto) {
         this.digest = digest;
@@ -37,7 +37,7 @@ public enum SignatureAlgorithm {
     }
 
     public static SignatureAlgorithm[] getForCrypto(String crypto) {
-        List<SignatureAlgorithm> list = new ArrayList<SignatureAlgorithm>();
+        List<SignatureAlgorithm> list = new ArrayList<>();
         for (SignatureAlgorithm alg: values()) {
             if (crypto.equalsIgnoreCase(alg.crypto)) {
                 list.add(alg);

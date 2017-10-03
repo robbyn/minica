@@ -23,8 +23,8 @@ import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
 public class PrivateKeyEntry extends KeyStoreEntry {
-    private PrivateKey key;
-    private X509Certificate chain[];
+    private final PrivateKey key;
+    private final X509Certificate chain[];
 
     public PrivateKeyEntry(String alias, PrivateKey key,
             X509Certificate chain[]) {

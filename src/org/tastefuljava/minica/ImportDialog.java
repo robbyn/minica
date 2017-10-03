@@ -74,11 +74,15 @@ public class ImportDialog extends JDialog {
         this.keystore = keystore;
         this.conf = conf;
         initComponents();
+        init(conf);
+    }
+
+    private void init(Configuration conf1) {
         chooser.addChoosableFileFilter(Filters.PEM_FILEFILTER);
         chooser.addChoosableFileFilter(Filters.PKCS12_FILEFILTER);
         chooser.addChoosableFileFilter(Filters.JKS_FILEFILTER);
         chooser.addChoosableFileFilter(Filters.CERT_FILEFILTER);
-        String s = conf.getString("import.file", "");
+        String s = conf1.getString("import.file", "");
         if (s.length() > 0) {
             chooser.setSelectedFile(new File(s));
         }

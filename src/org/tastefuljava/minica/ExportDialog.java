@@ -47,7 +47,6 @@ public class ExportDialog extends JDialog {
     private final KeyStore keystore;
     private final Configuration conf;
     private boolean done;
-    private boolean initialized;
 
     public ExportDialog(Frame parent, Configuration conf, KeyStore keystore,
             KeyStoreEntry current) throws KeyStoreException, IOException {
@@ -103,9 +102,11 @@ public class ExportDialog extends JDialog {
             KeyStoreEntry entry = entries[i];
             alias.addItem(entry);
         }
-        if (current != null) {
-            alias.setSelectedItem(current);
-        }
+        alias.setSelectedItem(current);
+        init(parent);
+    }
+
+    private void init(Frame parent) {
         getRootPane().setDefaultButton(ok);
         pack();
         setButtonStatus();
@@ -113,7 +114,6 @@ public class ExportDialog extends JDialog {
         int x = Math.max(rc.x + (rc.width-getWidth())/2, 0);
         int y = Math.max(rc.y + (rc.height-getHeight())/2, 0);
         setLocation(x, y);
-        initialized = true;
     }
 
     public boolean doDialog() {
@@ -561,7 +561,6 @@ public class ExportDialog extends JDialog {
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Error while importing data",
                     "Error", JOptionPane.ERROR_MESSAGE);
-            return;
         }
     }//GEN-LAST:event_okActionPerformed
 

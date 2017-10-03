@@ -31,18 +31,20 @@ import javax.swing.table.TableCellRenderer;
 
 public class KeyStoreEntryRenderer
         implements ListCellRenderer, TableCellRenderer {
-    private static Icon KEY_ICON = new ImageIcon(
+    private static final Icon KEY_ICON = new ImageIcon(
             KeyStoreEntryRenderer.class.getResource("/images/key-sn.png"));
-    private static Icon CERT_ICON = new ImageIcon(
+    private static final Icon CERT_ICON = new ImageIcon(
             KeyStoreEntryRenderer.class.getResource("/images/cert-sn.png"));
 
-    private JLabel label = new JLabel();
+    private final JLabel label = new JLabel();
 
+    @Override
     public Component getListCellRendererComponent(JList list, Object value,
             int index, boolean isSelected, boolean hasFocus) {
         return getCellRenderer(list, value, isSelected, hasFocus);
     }
 
+    @Override
     public Component getTableCellRendererComponent(JTable table, Object value,
             boolean isSelected, boolean hasFocus, int row, int column) {
         return getCellRenderer(table, value, isSelected, hasFocus);
