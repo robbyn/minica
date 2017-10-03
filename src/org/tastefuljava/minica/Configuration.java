@@ -40,23 +40,26 @@ public class Configuration implements Serializable {
     private static final DecimalFormat NUMBER_FORMAT;
 
     private final Properties props = new Properties();
+    private final File file;
 
-    public Configuration() {
+    public Configuration(File file) {
+        this.file = file;
     }
 
-    public Configuration(Properties props) {
+    public Configuration(File file, Properties props) {
+        this(file);
         this.props.putAll(props);
     }
 
     public Configuration(Configuration conf) {
-        this(conf.props);
+        this(conf.file, conf.props);
     }
 
     public String[] getNames() {
         return (String[])props.keySet().toArray(new String[props.size()]);
     }
 
-    public void load(File file) throws IOException {
+    public void load() throws IOException {
         props.clear();
         if (file.exists()) {
             try (InputStream in = new FileInputStream(file)) {
@@ -65,23 +68,11 @@ public class Configuration implements Serializable {
         }
     }
 
-
-    public void load(String fileName) throws IOException {
-        load(new File(fileName));
-    }
-
-
-    public void store(File file) throws IOException {
+    public void store() throws IOException {
         try (OutputStream out = new FileOutputStream(file)) {
             props.store(out, "configuration");
         }
     }
-
-
-    public void store(String fileName) throws IOException {
-        store(new File(fileName));
-    }
-
 
     public boolean getBoolean(String name, boolean def) {
         String value = getString(name, null);

@@ -48,7 +48,7 @@ public class MainFrame extends javax.swing.JFrame {
     private boolean changed;
     private File confFile = new File(System.getProperty("user.home"),
             "minica.properties");
-    private Configuration conf = new Configuration();
+    private Configuration conf = new Configuration(confFile);
 
     public MainFrame() throws IOException, GeneralSecurityException {
         initComponents();
@@ -56,7 +56,7 @@ public class MainFrame extends javax.swing.JFrame {
         keystore = KeyStore.getInstance("JKS");
         keystore.load(null, null);
         keystoreChanged();
-        conf.load(confFile);
+        conf.load();
         refreshInfo();
         setBounds(conf.getInt("frame.x", getX()),
                 conf.getInt("frame.y", getY()),
@@ -572,7 +572,7 @@ public class MainFrame extends javax.swing.JFrame {
         conf.setInt("frame.width", getWidth());
         conf.setInt("frame.height", getHeight());
         try {
-            conf.store(confFile);
+            conf.store();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, "Could not save configuration "
                     + confFile, "Error", JOptionPane.ERROR_MESSAGE);
@@ -591,7 +591,7 @@ public class MainFrame extends javax.swing.JFrame {
         try {
             ImportDialog dlg = new ImportDialog(this, conf, keystore);
             if (dlg.doDialog()) {
-                conf.store(confFile);
+                conf.store();
                 keystoreChanged();
             }
         } catch (Exception e) {
@@ -622,7 +622,7 @@ public class MainFrame extends javax.swing.JFrame {
                 ExportDialog dlg = new ExportDialog(this, conf, keystore,
                         (KeyStoreEntry)list.getSelectedValue());
                 if (dlg.doDialog()) {
-                    conf.store(confFile);
+                    conf.store();
                 }
             }
         } catch (Exception e) {
@@ -661,7 +661,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void genKeyItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_genKeyItemActionPerformed
         try {
-            GenerateKeyDialog dlg = new GenerateKeyDialog(this, keystore);
+            GenerateKeyDialog dlg = new GenerateKeyDialog(this, conf, keystore);
             if (dlg.showDialog()) {
                 keystore.setKeyEntry(dlg.getAlias(), dlg.getKey(),
                         dlg.getPassword(), dlg.getChain());

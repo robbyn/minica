@@ -56,10 +56,12 @@ public class GenerateKeyDialog extends JDialog {
     private PrivateKey privateKey;
     private Certificate[] chain;
     private final KeyStore keystore;
+    private final Configuration conf;
 
-    public GenerateKeyDialog(Frame parent, KeyStore keystore)
-            throws KeyStoreException {
+    public GenerateKeyDialog(Frame parent, Configuration conf, 
+            KeyStore keystore) throws KeyStoreException {
         super(parent, true);
+        this.conf = conf;
         this.keystore = keystore;
         initComponents();
         algorithm.removeAllItems();
@@ -93,7 +95,7 @@ public class GenerateKeyDialog extends JDialog {
         Util.adjustHeight(verification, textHeight);
         Calendar cal = Calendar.getInstance();
         startDate.setText(dateFormat.format(cal.getTime()));
-        cal.add(Calendar.YEAR, 1);
+        cal.add(Calendar.YEAR, 10);
         endDate.setText(dateFormat.format(cal.getTime()));
         getRootPane().setDefaultButton(ok);
         ec.removeAllItems();
@@ -105,6 +107,7 @@ public class GenerateKeyDialog extends JDialog {
         for (String curve: curves) {
             ec.addItem(curve);
         }
+        loadSomeFields();
         pack();
         Rectangle rc = parent.getBounds();
         int x = Math.max(rc.x + (rc.width-getWidth())/2, 0);
@@ -658,6 +661,7 @@ public class GenerateKeyDialog extends JDialog {
                     chain[++ix] = c;
                 }
             }
+            saveSomeFields();
         } catch (RuntimeException | OperatorCreationException
                 | CertificateException | IOException
                 | NoSuchAlgorithmException | NoSuchProviderException
@@ -782,4 +786,25 @@ public class GenerateKeyDialog extends JDialog {
     private javax.swing.JTextField state;
     private javax.swing.JPasswordField verification;
     // End of variables declaration//GEN-END:variables
+
+    private void loadSomeFields() {
+        country.setText(conf.getString("gen.country", ""));
+        state.setText(conf.getString("gen.state", ""));
+        locality.setText(conf.getString("gen.locality", ""));
+        locality.setText(conf.getString("gen.organisation", ""));
+        organisationUnit.setText(conf.getString("gen.organisationUnit", ""));
+        organisationUnit2.setText(conf.getString("gen.organisationUnit2", ""));
+        organisationUnit3.setText(conf.getString("gen.organisationUnit3", ""));
+    }
+
+    private void saveSomeFields() throws IOException {
+        conf.setString("gen.country", country.getText());
+        conf.setString("gen.state", state.getText());
+        conf.setString("gen.locality", locality.getText());
+        conf.setString("gen.organisation", locality.getText());
+        conf.setString("gen.organisationUnit", organisationUnit.getText());
+        conf.setString("gen.organisationUnit2", organisationUnit2.getText());
+        conf.setString("gen.organisationUnit3", organisationUnit3.getText());
+        conf.store();
+    }
 }
