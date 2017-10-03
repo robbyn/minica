@@ -47,6 +47,7 @@ public class ExportDialog extends JDialog {
     private final KeyStore keystore;
     private final Configuration conf;
     private boolean done;
+    private boolean initialized;
 
     public ExportDialog(Frame parent, Configuration conf, KeyStore keystore,
             KeyStoreEntry current) throws KeyStoreException, IOException {
@@ -65,6 +66,7 @@ public class ExportDialog extends JDialog {
                 name += ".pem";
                 break;
             case "pkcs12":
+            case "p12":
                 pkcs12.setSelected(true);
                 name += ".p12";
                 break;
@@ -111,6 +113,7 @@ public class ExportDialog extends JDialog {
         int x = Math.max(rc.x + (rc.width-getWidth())/2, 0);
         int y = Math.max(rc.y + (rc.height-getHeight())/2, 0);
         setLocation(x, y);
+        initialized = true;
     }
 
     public boolean doDialog() {
@@ -346,6 +349,11 @@ public class ExportDialog extends JDialog {
         formatGroup.add(pem);
         pem.setSelected(true);
         pem.setText("PEM (OpenSSL, OpenSSH)");
+        pem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pemActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
@@ -354,6 +362,11 @@ public class ExportDialog extends JDialog {
 
         formatGroup.add(pkcs12);
         pkcs12.setText("PKCS12");
+        pkcs12.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pkcs12ActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
@@ -363,6 +376,11 @@ public class ExportDialog extends JDialog {
 
         formatGroup.add(jks);
         jks.setText("JKS");
+        jks.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jksActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
@@ -372,6 +390,11 @@ public class ExportDialog extends JDialog {
 
         formatGroup.add(der);
         der.setText("DER");
+        der.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                derActionPerformed(evt);
+            }
+        });
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridwidth = java.awt.GridBagConstraints.REMAINDER;
@@ -569,6 +592,22 @@ public class ExportDialog extends JDialog {
         verification.setEditable(exportKey.isSelected());
     }//GEN-LAST:event_exportKeyActionPerformed
 
+    private void pemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pemActionPerformed
+        formatChanged("pem");
+    }//GEN-LAST:event_pemActionPerformed
+
+    private void pkcs12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pkcs12ActionPerformed
+        formatChanged("p12");
+    }//GEN-LAST:event_pkcs12ActionPerformed
+
+    private void jksActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jksActionPerformed
+        formatChanged("jks");
+    }//GEN-LAST:event_jksActionPerformed
+
+    private void derActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_derActionPerformed
+        formatChanged("der");
+    }//GEN-LAST:event_derActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox alias;
     private javax.swing.JPanel bottomPanel;
@@ -596,4 +635,15 @@ public class ExportDialog extends JDialog {
     private javax.swing.JRadioButton pkcs12;
     private javax.swing.JPasswordField verification;
     // End of variables declaration//GEN-END:variables
+
+    private void formatChanged(String fmt) {
+        File f = new File(file.getText());
+        String name = f.getName();
+        int ix = name.lastIndexOf('.');
+        if (ix >= 0) {
+            name = name.substring(0, ix+1);
+        }
+        name += fmt;
+        file.setText(new File(f.getParentFile(), name).getAbsolutePath());
+    }
 }
