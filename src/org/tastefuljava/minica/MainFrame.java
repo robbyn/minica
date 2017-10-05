@@ -124,6 +124,15 @@ public class MainFrame extends javax.swing.JFrame {
             }
         }
         delete.setEnabled(entries.length > 0);
+        rename.setEnabled(cert != null);
+        sshEncode.setEnabled(cert != null);
+        signItem.setEnabled(cert != null);
+        export.setEnabled(cert != null);
+        listDelete.setEnabled(entries.length > 0);
+        listRename.setEnabled(cert != null);
+        listSshEncode.setEnabled(cert != null);
+        listSign.setEnabled(cert != null);
+        listExport.setEnabled(cert != null);
         if (cert == null) {
             serialNumber.setText("");
             serialNumberHex.setText("");
@@ -946,21 +955,11 @@ public class MainFrame extends javax.swing.JFrame {
     }//GEN-LAST:event_listExportActionPerformed
 
     private void listPopupPopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_listPopupPopupMenuWillBecomeVisible
-        boolean hasSel = list.getSelectedIndex() >= 0;
-        listDelete.setEnabled(hasSel);
-        listRename.setEnabled(hasSel);
-        listSshEncode.setEnabled(hasSel);
-        listSign.setEnabled(hasSel);
-        listExport.setEnabled(hasSel);
+        refreshInfo();
     }//GEN-LAST:event_listPopupPopupMenuWillBecomeVisible
 
     private void certMenuMenuSelected(javax.swing.event.MenuEvent evt) {//GEN-FIRST:event_certMenuMenuSelected
-        boolean hasSel = list.getSelectedIndex() >= 0;
-        delete.setEnabled(hasSel);
-        rename.setEnabled(hasSel);
-        sshEncode.setEnabled(hasSel);
-        signItem.setEnabled(hasSel);
-        export.setEnabled(hasSel);
+        refreshInfo();
     }//GEN-LAST:event_certMenuMenuSelected
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
