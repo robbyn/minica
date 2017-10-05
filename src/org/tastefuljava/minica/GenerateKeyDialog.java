@@ -711,6 +711,11 @@ public class GenerateKeyDialog extends JDialog {
                             JOptionPane.ERROR_MESSAGE);
                 }
             }
+            SignatureAlgorithm alg = SignatureAlgorithm.forName(
+                    conf.getString("gen.signature-algorithm", ""));
+            if (alg != null) {
+                signatureAlg.setSelectedItem(alg);
+            }
         }
     }//GEN-LAST:event_signerActionPerformed
 
@@ -799,6 +804,21 @@ public class GenerateKeyDialog extends JDialog {
     private javax.swing.JPasswordField verification;
     // End of variables declaration//GEN-END:variables
 
+    private String getSigner() {
+        KeyStoreEntry entry = (KeyStoreEntry)signer.getSelectedItem();
+        return entry == null ? null : entry.getAlias();
+    }
+
+    private void setSigner(String name) {
+        for (int i = 0; i < signer.getItemCount(); ++i) {
+            KeyStoreEntry entry = (KeyStoreEntry)signer.getItemAt(i);
+            if (entry.getAlias().equals(name)) {
+                signer.setSelectedIndex(i);
+                break;
+            }
+        }
+    }
+
     private void loadSomeFields() {
         country.setText(conf.getString("gen.country", ""));
         state.setText(conf.getString("gen.state", ""));
@@ -807,6 +827,7 @@ public class GenerateKeyDialog extends JDialog {
         organisationUnit.setText(conf.getString("gen.organisationUnit", ""));
         organisationUnit2.setText(conf.getString("gen.organisationUnit2", ""));
         organisationUnit3.setText(conf.getString("gen.organisationUnit3", ""));
+        setSigner(conf.getString("gen.signer", ""));
     }
 
     private void saveSomeFields() throws IOException {
@@ -817,6 +838,12 @@ public class GenerateKeyDialog extends JDialog {
         conf.setString("gen.organisationUnit", organisationUnit.getText());
         conf.setString("gen.organisationUnit2", organisationUnit2.getText());
         conf.setString("gen.organisationUnit3", organisationUnit3.getText());
+        String alias = getSigner();
+        conf.setString("gen.signer", alias == null ? "" : alias);
+        SignatureAlgorithm alg
+                = (SignatureAlgorithm)signatureAlg.getSelectedItem();
+        conf.setString("gen.signature-algorithm",
+                alg == null ? "" : alg.name());
         conf.store();
     }
 }

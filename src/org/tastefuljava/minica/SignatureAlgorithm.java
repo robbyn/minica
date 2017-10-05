@@ -36,6 +36,15 @@ public enum SignatureAlgorithm {
         this.crypto = crypto;
     }
 
+    public static SignatureAlgorithm forName(String name) {
+        for (SignatureAlgorithm alg: values()) {
+            if (alg.name().equals(name)) {
+                return alg;
+            }
+        }
+        return null;
+    }
+
     public static SignatureAlgorithm[] getForCrypto(String crypto) {
         List<SignatureAlgorithm> list = new ArrayList<>();
         for (SignatureAlgorithm alg: values()) {
