@@ -803,7 +803,7 @@ public class GenerateKeyDialog extends JDialog {
         country.setText(conf.getString("gen.country", ""));
         state.setText(conf.getString("gen.state", ""));
         locality.setText(conf.getString("gen.locality", ""));
-        locality.setText(conf.getString("gen.organisation", ""));
+        organisation.setText(conf.getString("gen.organisation", ""));
         organisationUnit.setText(conf.getString("gen.organisationUnit", ""));
         organisationUnit2.setText(conf.getString("gen.organisationUnit2", ""));
         organisationUnit3.setText(conf.getString("gen.organisationUnit3", ""));
@@ -813,7 +813,7 @@ public class GenerateKeyDialog extends JDialog {
         conf.setString("gen.country", country.getText());
         conf.setString("gen.state", state.getText());
         conf.setString("gen.locality", locality.getText());
-        conf.setString("gen.organisation", locality.getText());
+        conf.setString("gen.organisation", organisation.getText());
         conf.setString("gen.organisationUnit", organisationUnit.getText());
         conf.setString("gen.organisationUnit2", organisationUnit2.getText());
         conf.setString("gen.organisationUnit3", organisationUnit3.getText());
