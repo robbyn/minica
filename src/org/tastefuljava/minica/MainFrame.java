@@ -224,8 +224,12 @@ public class MainFrame extends javax.swing.JFrame {
         java.awt.GridBagConstraints gridBagConstraints;
 
         listPopup = new javax.swing.JPopupMenu();
-        jMenuItem2 = new javax.swing.JMenuItem();
-        jMenuItem3 = new javax.swing.JMenuItem();
+        listSign = new javax.swing.JMenuItem();
+        listExport = new javax.swing.JMenuItem();
+        listDelete = new javax.swing.JMenuItem();
+        listRename = new javax.swing.JMenuItem();
+        jSeparator2 = new javax.swing.JPopupMenu.Separator();
+        listSshEncode = new javax.swing.JMenuItem();
         infoPanel = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         serialNumber = new javax.swing.JLabel();
@@ -268,22 +272,58 @@ public class MainFrame extends javax.swing.JFrame {
         sshEncode = new javax.swing.JMenuItem();
 
         listPopup.setComponentPopupMenu(listPopup);
-
-        jMenuItem2.setText("Delete...");
-        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem2ActionPerformed(evt);
+        listPopup.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
+            public void popupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {
+            }
+            public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent evt) {
+            }
+            public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {
+                listPopupPopupMenuWillBecomeVisible(evt);
             }
         });
-        listPopup.add(jMenuItem2);
 
-        jMenuItem3.setText("Rename...");
-        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+        listSign.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/sign-sn.png"))); // NOI18N
+        listSign.setText("Sign...");
+        listSign.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem3ActionPerformed(evt);
+                listSignActionPerformed(evt);
             }
         });
-        listPopup.add(jMenuItem3);
+        listPopup.add(listSign);
+
+        listExport.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/export-sn.png"))); // NOI18N
+        listExport.setText("Export...");
+        listExport.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                listExportActionPerformed(evt);
+            }
+        });
+        listPopup.add(listExport);
+
+        listDelete.setText("Delete...");
+        listDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                listDeleteActionPerformed(evt);
+            }
+        });
+        listPopup.add(listDelete);
+
+        listRename.setText("Rename...");
+        listRename.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                listRenameActionPerformed(evt);
+            }
+        });
+        listPopup.add(listRename);
+        listPopup.add(jSeparator2);
+
+        listSshEncode.setText("SSH encoding...");
+        listSshEncode.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                listSshEncodeActionPerformed(evt);
+            }
+        });
+        listPopup.add(listSshEncode);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -539,6 +579,15 @@ public class MainFrame extends javax.swing.JFrame {
         menuBar.add(fileMenu);
 
         certMenu.setText("Certificates");
+        certMenu.addMenuListener(new javax.swing.event.MenuListener() {
+            public void menuCanceled(javax.swing.event.MenuEvent evt) {
+            }
+            public void menuDeselected(javax.swing.event.MenuEvent evt) {
+            }
+            public void menuSelected(javax.swing.event.MenuEvent evt) {
+                certMenuMenuSelected(evt);
+            }
+        });
 
         genKeyItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/addkey-sn.png"))); // NOI18N
         genKeyItem.setText("Generate key...");
@@ -876,13 +925,43 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_renameActionPerformed
 
-    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+    private void listDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listDeleteActionPerformed
         delete.doClick();
-    }//GEN-LAST:event_jMenuItem2ActionPerformed
+    }//GEN-LAST:event_listDeleteActionPerformed
 
-    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+    private void listRenameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listRenameActionPerformed
         rename.doClick();
-    }//GEN-LAST:event_jMenuItem3ActionPerformed
+    }//GEN-LAST:event_listRenameActionPerformed
+
+    private void listSshEncodeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listSshEncodeActionPerformed
+        sshEncode.doClick();
+    }//GEN-LAST:event_listSshEncodeActionPerformed
+
+    private void listSignActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listSignActionPerformed
+        signItem.doClick();
+    }//GEN-LAST:event_listSignActionPerformed
+
+    private void listExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listExportActionPerformed
+        export.doClick();
+    }//GEN-LAST:event_listExportActionPerformed
+
+    private void listPopupPopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_listPopupPopupMenuWillBecomeVisible
+        boolean hasSel = list.getSelectedIndex() >= 0;
+        listDelete.setEnabled(hasSel);
+        listRename.setEnabled(hasSel);
+        listSshEncode.setEnabled(hasSel);
+        listSign.setEnabled(hasSel);
+        listExport.setEnabled(hasSel);
+    }//GEN-LAST:event_listPopupPopupMenuWillBecomeVisible
+
+    private void certMenuMenuSelected(javax.swing.event.MenuEvent evt) {//GEN-FIRST:event_certMenuMenuSelected
+        boolean hasSel = list.getSelectedIndex() >= 0;
+        delete.setEnabled(hasSel);
+        rename.setEnabled(hasSel);
+        sshEncode.setEnabled(hasSel);
+        signItem.setEnabled(hasSel);
+        export.setEnabled(hasSel);
+    }//GEN-LAST:event_certMenuMenuSelected
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu certMenu;
@@ -902,13 +981,17 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
+    private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JList list;
+    private javax.swing.JMenuItem listDelete;
+    private javax.swing.JMenuItem listExport;
     private javax.swing.JPopupMenu listPopup;
+    private javax.swing.JMenuItem listRename;
     private javax.swing.JScrollPane listScroll;
+    private javax.swing.JMenuItem listSign;
+    private javax.swing.JMenuItem listSshEncode;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JButton newButton;
     private javax.swing.JMenuItem newStoreItem;
