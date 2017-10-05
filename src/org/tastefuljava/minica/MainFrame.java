@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.GeneralSecurityException;
+import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.PublicKey;
@@ -222,6 +223,9 @@ public class MainFrame extends javax.swing.JFrame {
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
 
+        listPopup = new javax.swing.JPopupMenu();
+        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuItem3 = new javax.swing.JMenuItem();
         infoPanel = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         serialNumber = new javax.swing.JLabel();
@@ -259,8 +263,27 @@ public class MainFrame extends javax.swing.JFrame {
         impor = new javax.swing.JMenuItem();
         export = new javax.swing.JMenuItem();
         delete = new javax.swing.JMenuItem();
+        rename = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         sshEncode = new javax.swing.JMenuItem();
+
+        listPopup.setComponentPopupMenu(listPopup);
+
+        jMenuItem2.setText("Delete...");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        listPopup.add(jMenuItem2);
+
+        jMenuItem3.setText("Rename...");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        listPopup.add(jMenuItem3);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -354,6 +377,7 @@ public class MainFrame extends javax.swing.JFrame {
         listScroll.setPreferredSize(new java.awt.Dimension(240, 24));
 
         list.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        list.setComponentPopupMenu(listPopup);
         list.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 listValueChanged(evt);
@@ -559,6 +583,14 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         certMenu.add(delete);
+
+        rename.setText("Rename...");
+        rename.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                renameActionPerformed(evt);
+            }
+        });
+        certMenu.add(rename);
         certMenu.add(jSeparator1);
 
         sshEncode.setText("SSH encoding...");
@@ -801,6 +833,57 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_sshEncodeActionPerformed
 
+    private void renameActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_renameActionPerformed
+        try {
+            KeyStoreEntry entry = (KeyStoreEntry)list.getSelectedValue();
+            if (entry != null) {
+                String oldName = entry.getAlias();
+                String newName = RenameDialog.doDialog(this, oldName);
+                if (newName != null) {
+                    if (keystore.containsAlias(newName)) {
+                        JOptionPane.showMessageDialog(this,
+                                "Alias already exists: " + newName,
+                                "Error", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    if (entry.isKey()) {
+                        PasswordDialog dlg = new PasswordDialog(
+                                this, "Key password");
+                        char[] pwd = dlg.getPassword();
+                        if (pwd == null) {
+                            return;
+                        }
+                        Key privateKey = keystore.getKey(oldName, pwd);
+                        Certificate[] certs
+                                = keystore.getCertificateChain(oldName);
+                        keystore.setKeyEntry(newName, privateKey, pwd, certs);
+                        keystore.deleteEntry(oldName);
+                    } else {
+                        Certificate cert = keystore.getCertificate(oldName);
+                        keystore.setCertificateEntry(newName, cert);
+                        keystore.deleteEntry(oldName);
+                    }
+                    keystore.deleteEntry(oldName);
+                    changed = true;
+                    DefaultListModel model = (DefaultListModel)list.getModel();
+                    model.set(list.getSelectedIndex(),
+                            new KeyStoreEntry(newName, entry.isKey()));
+                }
+            }
+        } catch (GeneralSecurityException e) {
+            JOptionPane.showMessageDialog(this, "Could create keystore",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_renameActionPerformed
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        delete.doClick();
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        rename.doClick();
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu certMenu;
     private javax.swing.JMenuItem delete;
@@ -819,15 +902,19 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JList list;
+    private javax.swing.JPopupMenu listPopup;
     private javax.swing.JScrollPane listScroll;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JButton newButton;
     private javax.swing.JMenuItem newStoreItem;
     private javax.swing.JButton openButton;
     private javax.swing.JMenuItem openStoreItem;
+    private javax.swing.JMenuItem rename;
     private javax.swing.JButton saveButton;
     private javax.swing.JMenuItem saveStoreAsItem;
     private javax.swing.JMenuItem saveStoreItem;
