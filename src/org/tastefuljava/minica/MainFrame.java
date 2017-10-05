@@ -281,15 +281,6 @@ public class MainFrame extends javax.swing.JFrame {
         sshEncode = new javax.swing.JMenuItem();
 
         listPopup.setComponentPopupMenu(listPopup);
-        listPopup.addPopupMenuListener(new javax.swing.event.PopupMenuListener() {
-            public void popupMenuCanceled(javax.swing.event.PopupMenuEvent evt) {
-            }
-            public void popupMenuWillBecomeInvisible(javax.swing.event.PopupMenuEvent evt) {
-            }
-            public void popupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {
-                listPopupPopupMenuWillBecomeVisible(evt);
-            }
-        });
 
         listSign.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/sign-sn.png"))); // NOI18N
         listSign.setText("Sign...");
@@ -588,15 +579,6 @@ public class MainFrame extends javax.swing.JFrame {
         menuBar.add(fileMenu);
 
         certMenu.setText("Certificates");
-        certMenu.addMenuListener(new javax.swing.event.MenuListener() {
-            public void menuCanceled(javax.swing.event.MenuEvent evt) {
-            }
-            public void menuDeselected(javax.swing.event.MenuEvent evt) {
-            }
-            public void menuSelected(javax.swing.event.MenuEvent evt) {
-                certMenuMenuSelected(evt);
-            }
-        });
 
         genKeyItem.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/addkey-sn.png"))); // NOI18N
         genKeyItem.setText("Generate key...");
@@ -953,14 +935,6 @@ public class MainFrame extends javax.swing.JFrame {
     private void listExportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listExportActionPerformed
         export.doClick();
     }//GEN-LAST:event_listExportActionPerformed
-
-    private void listPopupPopupMenuWillBecomeVisible(javax.swing.event.PopupMenuEvent evt) {//GEN-FIRST:event_listPopupPopupMenuWillBecomeVisible
-        refreshInfo();
-    }//GEN-LAST:event_listPopupPopupMenuWillBecomeVisible
-
-    private void certMenuMenuSelected(javax.swing.event.MenuEvent evt) {//GEN-FIRST:event_certMenuMenuSelected
-        refreshInfo();
-    }//GEN-LAST:event_certMenuMenuSelected
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu certMenu;

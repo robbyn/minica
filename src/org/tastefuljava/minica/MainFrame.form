@@ -8,9 +8,6 @@
           <ComponentRef name="listPopup"/>
         </Property>
       </Properties>
-      <Events>
-        <EventHandler event="popupMenuWillBecomeVisible" listener="javax.swing.event.PopupMenuListener" parameters="javax.swing.event.PopupMenuEvent" handler="listPopupPopupMenuWillBecomeVisible"/>
-      </Events>
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout">
         <Property name="useNullLayout" type="boolean" value="true"/>
@@ -132,9 +129,6 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Certificates"/>
           </Properties>
-          <Events>
-            <EventHandler event="menuSelected" listener="javax.swing.event.MenuListener" parameters="javax.swing.event.MenuEvent" handler="certMenuMenuSelected"/>
-          </Events>
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="genKeyItem">
               <Properties>
