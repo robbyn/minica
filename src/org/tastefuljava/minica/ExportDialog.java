@@ -39,10 +39,6 @@ import org.bouncycastle.openssl.PEMEncryptor;
 import org.bouncycastle.openssl.PEMWriter;
 import org.bouncycastle.openssl.jcajce.JcePEMEncryptorBuilder;
 
-/**
- *
- * @author  PERRYM
- */
 public class ExportDialog extends JDialog {
     private final KeyStore keystore;
     private final Configuration conf;
@@ -57,7 +53,9 @@ public class ExportDialog extends JDialog {
         String s = conf.getString("export.file", "");
         File dir = s.length() == 0
                 ? new File(".") : new File(s).getParentFile();
-        String name = current != null ? current.getAlias() : "export";
+        String name = current != null
+                ? KeyStoreEntry.subjectName(keystore, current.getAlias())
+                : "export";
         String format = conf.getString("export.format", "pem");
         switch (format) {
             case "pem":

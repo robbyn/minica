@@ -36,7 +36,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -46,8 +45,6 @@ import org.bouncycastle.asn1.x500.X500Name;
 public class MainFrame extends javax.swing.JFrame {
     private static final DateFormat dateFormat
             = new SimpleDateFormat("dd-MM-yyyy");
-    private static final Pattern RDN_PATTERN
-            = Pattern.compile("^\\s*([^\\s,=]+)\\s*=\\s*([^,]*)\\s*(?:,(.*))?$");
 
     private KeyStore keystore;
     private File keystoreFile;
@@ -1011,9 +1008,9 @@ public class MainFrame extends javax.swing.JFrame {
                     }
                 }
                 if (key != null) {
-                    return certName(key.getAlias()) + ".jks";
+                    return subjectName(key) + ".jks";
                 } else if (entries.length == 1) {
-                    return certName(entries[0].getAlias()) + ".jks";
+                    return subjectName(entries[0]) + ".jks";
                 }
             } catch (KeyStoreException ex) {
                 // ignore
@@ -1022,21 +1019,8 @@ public class MainFrame extends javax.swing.JFrame {
         return "keystore.jks";
     }
 
-    private String certName(String alias) throws KeyStoreException {
-        X509Certificate cert = (X509Certificate)keystore.getCertificate(alias);
-        String name = cert.getSubjectX500Principal().getName();
-        while (name != null) {
-            Matcher matcher = RDN_PATTERN.matcher(name);
-            if (!matcher.matches()) {
-                break;
-            }
-            String key = matcher.group(1);
-            String value = matcher.group(2);
-            name = matcher.group(3);
-            if (key.equalsIgnoreCase("cn")) {
-                return value;
-            }
-        }
-        return alias;
+    private String subjectName(KeyStoreEntry key) throws KeyStoreException {
+        return KeyStoreEntry.subjectName(keystore, key.getAlias());
     }
+
 }

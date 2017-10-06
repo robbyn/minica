@@ -74,17 +74,20 @@ public class ImportDialog extends JDialog {
         this.keystore = keystore;
         this.conf = conf;
         initComponents();
-        init(conf);
+        init();
     }
 
-    private void init(Configuration conf1) {
+    private void init() {
         chooser.addChoosableFileFilter(Filters.PEM_FILEFILTER);
         chooser.addChoosableFileFilter(Filters.PKCS12_FILEFILTER);
         chooser.addChoosableFileFilter(Filters.JKS_FILEFILTER);
         chooser.addChoosableFileFilter(Filters.CERT_FILEFILTER);
-        String s = conf1.getString("import.file", "");
+        String s = conf.getString("import.dir", "");
         if (s.length() > 0) {
-            chooser.setSelectedFile(new File(s));
+            File dir = new File(s);
+            if (dir.isDirectory()) {
+                chooser.setCurrentDirectory(dir);
+            }
         }
         table.setModel(model);
         table.setDefaultEditor(KeyStoreEntry.class, new KeyStoreEntryEditor());
@@ -133,6 +136,9 @@ public class ImportDialog extends JDialog {
                             loadCert(chooser.getSelectedFile());
                         }
                         fillTable();
+                        conf.setString("import.dir",
+                                chooser.getSelectedFile().getParent());
+                        conf.store();
                     } catch (IOException | GeneralSecurityException e) {
                         JOptionPane.showMessageDialog(this,
                                 "Error while importing file "

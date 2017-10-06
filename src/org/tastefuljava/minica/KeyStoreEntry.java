@@ -19,15 +19,20 @@ package org.tastefuljava.minica;
 
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class KeyStoreEntry {
     public static final Comparator<KeyStoreEntry> TYPE_ALIAS_ORDER;
     public static final Comparator<KeyStoreEntry> ALIAS_ORDER;
+    private static final Pattern RDN_PATTERN
+            = Pattern.compile("^\\s*([^\\s,=]+)\\s*=\\s*([^,]*)\\s*(?:,(.*))?$");
 
     private final String alias;
     private final boolean key;
@@ -35,6 +40,25 @@ public class KeyStoreEntry {
     public KeyStoreEntry(String alias, boolean key) {
         this.alias = alias;
         this.key = key;
+    }
+
+    public static String subjectName(KeyStore keystore, String alias)
+            throws KeyStoreException {
+        X509Certificate cert = (X509Certificate)keystore.getCertificate(alias);
+        String name = cert.getSubjectX500Principal().getName();
+        while (name != null) {
+            Matcher matcher = RDN_PATTERN.matcher(name);
+            if (!matcher.matches()) {
+                break;
+            }
+            String key = matcher.group(1);
+            String value = matcher.group(2);
+            name = matcher.group(3);
+            if (key.equalsIgnoreCase("cn")) {
+                return value;
+            }
+        }
+        return alias;
     }
 
     public static KeyStoreEntry[] getAll(KeyStore keystore)
