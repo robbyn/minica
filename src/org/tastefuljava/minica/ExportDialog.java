@@ -57,7 +57,7 @@ public class ExportDialog extends JDialog {
         String s = conf.getString("export.file", "");
         File dir = s.length() == 0
                 ? new File(".") : new File(s).getParentFile();
-        String name = current.getAlias();
+        String name = current != null ? current.getAlias() : "export";
         String format = conf.getString("export.format", "pem");
         switch (format) {
             case "pem":
@@ -104,6 +104,12 @@ public class ExportDialog extends JDialog {
         }
         alias.setSelectedItem(current);
         init(parent);
+        KeyStoreEntry entry = (KeyStoreEntry)alias.getSelectedItem();
+        if (entry != null && entry.isKey()) {
+            exportKey.setSelected(true);
+            exportChain.setSelected(true);
+            exportKeyChanged();
+        }
     }
 
     private void init(Frame parent) {
@@ -567,10 +573,10 @@ public class ExportDialog extends JDialog {
     private void aliasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_aliasActionPerformed
         KeyStoreEntry entry = (KeyStoreEntry)alias.getSelectedItem();
         boolean isKey = entry != null && entry.isKey();
-        if (!isKey) {
-            exportKey.setSelected(false);
-        }
         exportKey.setEnabled(isKey);
+        exportKey.setSelected(isKey);
+        exportChain.setSelected(isKey);
+        exportKeyChanged();
     }//GEN-LAST:event_aliasActionPerformed
 
     private void exportChainActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportChainActionPerformed
@@ -586,10 +592,14 @@ public class ExportDialog extends JDialog {
     }//GEN-LAST:event_exportCertActionPerformed
 
     private void exportKeyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportKeyActionPerformed
+        exportKeyChanged();
+    }//GEN-LAST:event_exportKeyActionPerformed
+
+    private void exportKeyChanged() {
         password.setEditable(exportKey.isSelected());
         outPassword.setEditable(exportKey.isSelected());
         verification.setEditable(exportKey.isSelected());
-    }//GEN-LAST:event_exportKeyActionPerformed
+    }
 
     private void pemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pemActionPerformed
         formatChanged("pem");
