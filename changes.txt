@@ -1,5 +1,5 @@
 V0.13:
-    - move to using maven
+    - move to using maven.
 
 V0.12:
     - in SSH encoding dialog, add the alias as a comment
