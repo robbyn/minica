@@ -151,8 +151,4 @@ public class RenameDialog extends javax.swing.JDialog {
     private javax.swing.JTextField newName;
     private javax.swing.JButton ok;
     // End of variables declaration//GEN-END:variables
-
-    private void setStatus() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 }

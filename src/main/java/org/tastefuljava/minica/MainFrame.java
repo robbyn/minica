@@ -35,7 +35,6 @@ import java.security.interfaces.RSAPublicKey;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.regex.Matcher;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -114,8 +113,9 @@ public class MainFrame extends javax.swing.JFrame {
     private void refreshInfo() {
         Object entries[] = list.getSelectedValues();
         X509Certificate cert = null;
+        KeyStoreEntry entry = null;
         if (entries.length == 1) {
-            KeyStoreEntry entry = (KeyStoreEntry)entries[0];
+            entry = (KeyStoreEntry)entries[0];
             try {
                 cert = (X509Certificate)keystore.getCertificate(
                         entry.getAlias());
@@ -127,6 +127,8 @@ public class MainFrame extends javax.swing.JFrame {
         }
         delete.setEnabled(entries.length > 0);
         rename.setEnabled(cert != null);
+        changePwd.setEnabled(entry != null && entry.isKey());
+        listChangePwd.setEnabled(entry != null && entry.isKey());
         sshEncode.setEnabled(cert != null);
         signItem.setEnabled(cert != null);
         export.setEnabled(cert != null);
@@ -243,6 +245,7 @@ public class MainFrame extends javax.swing.JFrame {
         listExport = new javax.swing.JMenuItem();
         listDelete = new javax.swing.JMenuItem();
         listRename = new javax.swing.JMenuItem();
+        listChangePwd = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         listSshEncode = new javax.swing.JMenuItem();
         infoPanel = new javax.swing.JPanel();
@@ -283,6 +286,7 @@ public class MainFrame extends javax.swing.JFrame {
         export = new javax.swing.JMenuItem();
         delete = new javax.swing.JMenuItem();
         rename = new javax.swing.JMenuItem();
+        changePwd = new javax.swing.JMenuItem();
         jSeparator1 = new javax.swing.JPopupMenu.Separator();
         sshEncode = new javax.swing.JMenuItem();
 
@@ -321,6 +325,14 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         listPopup.add(listRename);
+
+        listChangePwd.setText("Change password...");
+        listChangePwd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                listChangePwdActionPerformed(evt);
+            }
+        });
+        listPopup.add(listChangePwd);
         listPopup.add(jSeparator2);
 
         listSshEncode.setText("SSH encoding...");
@@ -382,8 +394,8 @@ public class MainFrame extends javax.swing.JFrame {
         gridBagConstraints.insets = new java.awt.Insets(12, 12, 0, 11);
         infoPanel.add(jLabel2, gridBagConstraints);
 
-        issuer.setColumns(32);
         issuer.setEditable(false);
+        issuer.setColumns(32);
         issuer.setRows(5);
         issuer.setMinimumSize(new java.awt.Dimension(256, 90));
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -637,6 +649,14 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         certMenu.add(rename);
+
+        changePwd.setText("Change password...");
+        changePwd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                changePwdActionPerformed(evt);
+            }
+        });
+        certMenu.add(changePwd);
         certMenu.add(jSeparator1);
 
         sshEncode.setText("SSH encoding...");
@@ -942,8 +962,24 @@ public class MainFrame extends javax.swing.JFrame {
         export.doClick();
     }//GEN-LAST:event_listExportActionPerformed
 
+    private void changePwdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changePwdActionPerformed
+        KeyStoreEntry entry = (KeyStoreEntry)list.getSelectedValue();
+        if (entry != null && entry.isKey()) {
+            ChangePasswordDialog dlg = new ChangePasswordDialog(this, keystore,
+                    entry.getAlias());
+            if (dlg.doDialog()) {
+                // done
+            }
+        }
+    }//GEN-LAST:event_changePwdActionPerformed
+
+    private void listChangePwdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listChangePwdActionPerformed
+        changePwd.doClick();
+    }//GEN-LAST:event_listChangePwdActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu certMenu;
+    private javax.swing.JMenuItem changePwd;
     private javax.swing.JMenuItem delete;
     private javax.swing.JLabel endDate;
     private javax.swing.JMenuItem export;
@@ -964,6 +1000,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JList list;
+    private javax.swing.JMenuItem listChangePwd;
     private javax.swing.JMenuItem listDelete;
     private javax.swing.JMenuItem listExport;
     private javax.swing.JPopupMenu listPopup;
