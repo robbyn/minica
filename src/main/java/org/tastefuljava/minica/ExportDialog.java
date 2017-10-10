@@ -206,7 +206,7 @@ public class ExportDialog extends JDialog {
     private void exportPkcs12(OutputStream out, String alias, Key key,
             Certificate cert, Certificate chain[], char pwd[])
             throws Exception {
-        KeyStore store = KeyStore.getInstance("PKCS12", "BC");
+        KeyStore store = KeyStore.getInstance("PKCS12");
         store.load(null, null);
         if (key != null) {
             for (int i = 1; i < chain.length; ++i) {
