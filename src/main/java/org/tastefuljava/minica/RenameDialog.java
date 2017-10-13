@@ -67,6 +67,9 @@ public class RenameDialog extends javax.swing.JDialog {
         int y = Math.max(rc.y + (rc.height-getHeight())/2, 0);
         setLocation(x, y);
         ok.setEnabled(false);
+        newName.setSelectionStart(0);
+        newName.setSelectionEnd(name.length());
+        newName.requestFocus();
     }
 
     @SuppressWarnings("unchecked")
