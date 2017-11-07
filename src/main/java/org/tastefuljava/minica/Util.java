@@ -58,4 +58,15 @@ public class Util {
             }
         }
     }
+
+    public static String cleanupName(String s) {
+        StringBuilder buf = new StringBuilder();
+        for (char c: s.toCharArray()) {
+            if (Character.isLetter(c) || Character.isDigit(c)
+                    || c == '$' || c == '.' || c == '_' || c == '-') {
+                buf.append(c);
+            }
+        }
+        return buf.toString();
+    }
 }

@@ -56,6 +56,7 @@ public class ExportDialog extends JDialog {
         String name = current != null
                 ? KeyStoreEntry.subjectName(keystore, current.getAlias())
                 : "export";
+        name = Util.cleanupName(name);
         String format = conf.getString("export.format", "pem");
         switch (format) {
             case "pem":
