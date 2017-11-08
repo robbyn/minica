@@ -19,15 +19,21 @@ package org.tastefuljava.minica;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
@@ -36,11 +42,19 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
+import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 
 public class MainFrame extends javax.swing.JFrame {
     private static final DateFormat dateFormat
@@ -1025,7 +1039,9 @@ public class MainFrame extends javax.swing.JFrame {
                     }
                     generateCSR(entry, file);
                 }
-            } catch (KeyStoreException ex) {
+            } catch (NoSuchAlgorithmException | UnrecoverableKeyException
+                    | OperatorCreationException | IOException
+                    | KeyStoreException ex) {
                 JOptionPane.showMessageDialog(this, "Could not generate CSR",
                         "Error", JOptionPane.ERROR_MESSAGE);
             }
@@ -1116,7 +1132,28 @@ public class MainFrame extends javax.swing.JFrame {
         return key.subjectName(keystore);
     }
 
-    private void generateCSR(KeyStoreEntry entry, File file) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    private void generateCSR(KeyStoreEntry entry, File file)
+            throws KeyStoreException, NoSuchAlgorithmException,
+            UnrecoverableKeyException, OperatorCreationException, FileNotFoundException, IOException {
+        X509Certificate cert = entry.getCertificate(keystore);
+        keystore.getCertificateChain(entry.getAlias());
+        PasswordDialog dlg = new PasswordDialog(
+                this, "Key password");
+        char[] pwd = dlg.getPassword();
+        if (pwd == null) {
+            return;
+        }
+        PrivateKey priKey = entry.getPrivateKey(keystore, pwd);
+        PKCS10CertificationRequestBuilder p10Builder
+                = new JcaPKCS10CertificationRequestBuilder(
+                        cert.getSubjectX500Principal(), cert.getPublicKey());
+        JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder(cert.getSigAlgName());
+        ContentSigner signer = csBuilder.build(priKey);
+        PKCS10CertificationRequest csr = p10Builder.build(signer);
+        try (OutputStream stream = new FileOutputStream(file);
+                Writer writer = new OutputStreamWriter(stream, "UTF-8");
+                JcaPEMWriter out = new JcaPEMWriter(writer)) {
+            out.writeObject(csr);
+        }
     }
 }

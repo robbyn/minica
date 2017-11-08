@@ -19,6 +19,9 @@ package org.tastefuljava.minica;
 
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -59,6 +62,17 @@ public class KeyStoreEntry {
             }
         }
         return alias;
+    }
+
+    public X509Certificate getCertificate(KeyStore keystore)
+            throws KeyStoreException {
+        return (X509Certificate) keystore.getCertificate(alias);
+    }
+
+    public PrivateKey getPrivateKey(KeyStore keystore, char[] password)
+            throws KeyStoreException, NoSuchAlgorithmException,
+            UnrecoverableKeyException {
+        return (PrivateKey)keystore.getKey(alias, password);
     }
 
     public static KeyStoreEntry[] getAll(KeyStore keystore)
@@ -125,39 +139,33 @@ public class KeyStoreEntry {
     }
 
     static {
-        TYPE_ALIAS_ORDER = new Comparator<KeyStoreEntry>() {
-            @Override
-            public int compare(KeyStoreEntry e1, KeyStoreEntry e2) {
-                if (e1 == e2) {
-                    return 0;
-                } else if (e1 == null) {
+        TYPE_ALIAS_ORDER = (KeyStoreEntry e1, KeyStoreEntry e2) -> {
+            if (e1 == e2) {
+                return 0;
+            } else if (e1 == null) {
+                return -1;
+            } else if (e2 == null) {
+                return 1;
+            } else {
+                if (e1.isKey() && !e2.isKey()) {
                     return -1;
-                } else if (e2 == null) {
-                    return 1;
-                } else {
-                    if (e1.isKey() && !e2.isKey()) {
-                        return -1;
-                    } else if (!e1.isKey() && e2.isKey()) {
-                        return 1;
-                    } else {
-                        return e1.getAlias().compareToIgnoreCase(e2.getAlias());
-                    }
-                }
-            }
-        };
-
-        ALIAS_ORDER = new Comparator<KeyStoreEntry>() {
-            @Override
-            public int compare(KeyStoreEntry e1, KeyStoreEntry e2) {
-                if (e1 == e2) {
-                    return 0;
-                } else if (e1 == null) {
-                    return -1;
-                } else if (e2 == null) {
+                } else if (!e1.isKey() && e2.isKey()) {
                     return 1;
                 } else {
                     return e1.getAlias().compareToIgnoreCase(e2.getAlias());
                 }
+            }
+        };
+
+        ALIAS_ORDER = (KeyStoreEntry e1, KeyStoreEntry e2) -> {
+            if (e1 == e2) {
+                return 0;
+            } else if (e1 == null) {
+                return -1;
+            } else if (e2 == null) {
+                return 1;
+            } else {
+                return e1.getAlias().compareToIgnoreCase(e2.getAlias());
             }
         };
     }
