@@ -42,7 +42,7 @@ public class KeyStoreEntry {
         this.key = key;
     }
 
-    public static String subjectName(KeyStore keystore, String alias)
+    public String subjectName(KeyStore keystore)
             throws KeyStoreException {
         X509Certificate cert = (X509Certificate)keystore.getCertificate(alias);
         String name = cert.getSubjectX500Principal().getName();

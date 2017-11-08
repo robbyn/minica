@@ -130,6 +130,7 @@ public class MainFrame extends javax.swing.JFrame {
         rename.setEnabled(cert != null);
         changePwd.setEnabled(entry != null && entry.isKey());
         listChangePwd.setEnabled(entry != null && entry.isKey());
+        generateCSR.setEnabled(entry != null && entry.isKey());
         sshEncode.setEnabled(cert != null);
         signItem.setEnabled(cert != null);
         export.setEnabled(cert != null);
@@ -1112,7 +1113,7 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private String subjectName(KeyStoreEntry key) throws KeyStoreException {
-        return KeyStoreEntry.subjectName(keystore, key.getAlias());
+        return key.subjectName(keystore);
     }
 
     private void generateCSR(KeyStoreEntry entry, File file) {

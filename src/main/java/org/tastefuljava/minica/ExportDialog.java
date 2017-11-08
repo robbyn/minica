@@ -54,7 +54,7 @@ public class ExportDialog extends JDialog {
         File dir = s.length() == 0
                 ? new File(".") : new File(s).getParentFile();
         String name = current != null
-                ? KeyStoreEntry.subjectName(keystore, current.getAlias())
+                ? current.subjectName(keystore)
                 : "export";
         String format = conf.getString("export.format", "pem");
         switch (format) {
