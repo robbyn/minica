@@ -35,6 +35,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.logging.Level;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -282,6 +283,7 @@ public class MainFrame extends javax.swing.JFrame {
         certMenu = new javax.swing.JMenu();
         genKeyItem = new javax.swing.JMenuItem();
         signItem = new javax.swing.JMenuItem();
+        generateCSR = new javax.swing.JMenuItem();
         impor = new javax.swing.JMenuItem();
         export = new javax.swing.JMenuItem();
         delete = new javax.swing.JMenuItem();
@@ -615,6 +617,14 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         certMenu.add(signItem);
+
+        generateCSR.setText("Generate CSR...");
+        generateCSR.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                generateCSRActionPerformed(evt);
+            }
+        });
+        certMenu.add(generateCSR);
 
         impor.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/import-sn.png"))); // NOI18N
         impor.setText("Import...");
@@ -977,6 +987,50 @@ public class MainFrame extends javax.swing.JFrame {
         changePwd.doClick();
     }//GEN-LAST:event_listChangePwdActionPerformed
 
+    private void generateCSRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateCSRActionPerformed
+        KeyStoreEntry entry = (KeyStoreEntry)list.getSelectedValue();
+        if (entry != null && entry.isKey()) {
+            try {
+                File dir = keystoreFile.getParentFile();
+                JFileChooser chooser = new JFileChooser();
+                chooser.addChoosableFileFilter(new FileFilter() {
+                    @Override
+                    public String getDescription() {
+                        return "CSR files (*.csr)";
+                    }
+                    
+                    @Override
+                    public boolean accept(File file) {
+                        if (file.isDirectory()) {
+                            return true;
+                        } else if (file.isFile()) {
+                            String name = file.getName();
+                            return name.toLowerCase().endsWith(".csr");
+                        } else {
+                            return false;
+                        }
+                    }
+                });
+                chooser.setCurrentDirectory(dir);
+                chooser.setSelectedFile(
+                        new File(dir, subjectName(entry)+ ".csr"));
+                chooser.setDialogTitle("Save CSR");
+                if (JFileChooser.APPROVE_OPTION
+                        == chooser.showSaveDialog(this)) {
+                    File file = chooser.getSelectedFile();
+                    if (file.getName().toLowerCase().indexOf('.') < 0) {
+                        file = new File(
+                                file.getParentFile(), file.getName() + ".csr");
+                    }
+                    generateCSR(entry, file);
+                }
+            } catch (KeyStoreException ex) {
+                JOptionPane.showMessageDialog(this, "Could not generate CSR",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_generateCSRActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu certMenu;
     private javax.swing.JMenuItem changePwd;
@@ -987,6 +1041,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenu fileMenu;
     private javax.swing.JButton genKeyButton;
     private javax.swing.JMenuItem genKeyItem;
+    private javax.swing.JMenuItem generateCSR;
     private javax.swing.JMenuItem impor;
     private javax.swing.JButton importButton;
     private javax.swing.JPanel infoPanel;
@@ -1060,4 +1115,7 @@ public class MainFrame extends javax.swing.JFrame {
         return KeyStoreEntry.subjectName(keystore, key.getAlias());
     }
 
+    private void generateCSR(KeyStoreEntry entry, File file) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }
