@@ -19,15 +19,21 @@ package org.tastefuljava.minica;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.DSAPublicKey;
@@ -35,11 +41,20 @@ import java.security.interfaces.RSAPublicKey;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import org.bouncycastle.asn1.x500.X500Name;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
+import org.bouncycastle.operator.ContentSigner;
+import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.PKCS10CertificationRequestBuilder;
+import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 
 public class MainFrame extends javax.swing.JFrame {
     private static final DateFormat dateFormat
@@ -129,6 +144,7 @@ public class MainFrame extends javax.swing.JFrame {
         rename.setEnabled(cert != null);
         changePwd.setEnabled(entry != null && entry.isKey());
         listChangePwd.setEnabled(entry != null && entry.isKey());
+        generateCSR.setEnabled(entry != null && entry.isKey());
         sshEncode.setEnabled(cert != null);
         signItem.setEnabled(cert != null);
         export.setEnabled(cert != null);
@@ -282,6 +298,7 @@ public class MainFrame extends javax.swing.JFrame {
         certMenu = new javax.swing.JMenu();
         genKeyItem = new javax.swing.JMenuItem();
         signItem = new javax.swing.JMenuItem();
+        generateCSR = new javax.swing.JMenuItem();
         impor = new javax.swing.JMenuItem();
         export = new javax.swing.JMenuItem();
         delete = new javax.swing.JMenuItem();
@@ -615,6 +632,14 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         certMenu.add(signItem);
+
+        generateCSR.setText("Generate CSR...");
+        generateCSR.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                generateCSRActionPerformed(evt);
+            }
+        });
+        certMenu.add(generateCSR);
 
         impor.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/import-sn.png"))); // NOI18N
         impor.setText("Import...");
@@ -977,6 +1002,52 @@ public class MainFrame extends javax.swing.JFrame {
         changePwd.doClick();
     }//GEN-LAST:event_listChangePwdActionPerformed
 
+    private void generateCSRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_generateCSRActionPerformed
+        KeyStoreEntry entry = (KeyStoreEntry)list.getSelectedValue();
+        if (entry != null && entry.isKey()) {
+            try {
+                File dir = keystoreFile.getParentFile();
+                JFileChooser chooser = new JFileChooser();
+                chooser.addChoosableFileFilter(new FileFilter() {
+                    @Override
+                    public String getDescription() {
+                        return "CSR files (*.csr)";
+                    }
+                    
+                    @Override
+                    public boolean accept(File file) {
+                        if (file.isDirectory()) {
+                            return true;
+                        } else if (file.isFile()) {
+                            String name = file.getName();
+                            return name.toLowerCase().endsWith(".csr");
+                        } else {
+                            return false;
+                        }
+                    }
+                });
+                chooser.setCurrentDirectory(dir);
+                chooser.setSelectedFile(
+                        new File(dir, subjectName(entry)+ ".csr"));
+                chooser.setDialogTitle("Save CSR");
+                if (JFileChooser.APPROVE_OPTION
+                        == chooser.showSaveDialog(this)) {
+                    File file = chooser.getSelectedFile();
+                    if (file.getName().toLowerCase().indexOf('.') < 0) {
+                        file = new File(
+                                file.getParentFile(), file.getName() + ".csr");
+                    }
+                    generateCSR(entry, file);
+                }
+            } catch (NoSuchAlgorithmException | UnrecoverableKeyException
+                    | OperatorCreationException | IOException
+                    | KeyStoreException ex) {
+                JOptionPane.showMessageDialog(this, "Could not generate CSR",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_generateCSRActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu certMenu;
     private javax.swing.JMenuItem changePwd;
@@ -987,6 +1058,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenu fileMenu;
     private javax.swing.JButton genKeyButton;
     private javax.swing.JMenuItem genKeyItem;
+    private javax.swing.JMenuItem generateCSR;
     private javax.swing.JMenuItem impor;
     private javax.swing.JButton importButton;
     private javax.swing.JPanel infoPanel;
@@ -1057,7 +1129,31 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     private String subjectName(KeyStoreEntry key) throws KeyStoreException {
-        return KeyStoreEntry.subjectName(keystore, key.getAlias());
+        return key.subjectName(keystore);
     }
 
+    private void generateCSR(KeyStoreEntry entry, File file)
+            throws KeyStoreException, NoSuchAlgorithmException,
+            UnrecoverableKeyException, OperatorCreationException, FileNotFoundException, IOException {
+        X509Certificate cert = entry.getCertificate(keystore);
+        keystore.getCertificateChain(entry.getAlias());
+        PasswordDialog dlg = new PasswordDialog(
+                this, "Key password");
+        char[] pwd = dlg.getPassword();
+        if (pwd == null) {
+            return;
+        }
+        PrivateKey priKey = entry.getPrivateKey(keystore, pwd);
+        PKCS10CertificationRequestBuilder p10Builder
+                = new JcaPKCS10CertificationRequestBuilder(
+                        cert.getSubjectX500Principal(), cert.getPublicKey());
+        JcaContentSignerBuilder csBuilder = new JcaContentSignerBuilder(cert.getSigAlgName());
+        ContentSigner signer = csBuilder.build(priKey);
+        PKCS10CertificationRequest csr = p10Builder.build(signer);
+        try (OutputStream stream = new FileOutputStream(file);
+                Writer writer = new OutputStreamWriter(stream, "UTF-8");
+                JcaPEMWriter out = new JcaPEMWriter(writer)) {
+            out.writeObject(csr);
+        }
+    }
 }

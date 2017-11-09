@@ -24,6 +24,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -37,6 +38,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.bouncycastle.openssl.PEMEncryptor;
 import org.bouncycastle.openssl.PEMWriter;
+import org.bouncycastle.openssl.jcajce.JcaPEMWriter;
 import org.bouncycastle.openssl.jcajce.JcePEMEncryptorBuilder;
 
 public class ExportDialog extends JDialog {
@@ -54,7 +56,7 @@ public class ExportDialog extends JDialog {
         File dir = s.length() == 0
                 ? new File(".") : new File(s).getParentFile();
         String name = current != null
-                ? KeyStoreEntry.subjectName(keystore, current.getAlias())
+                ? current.subjectName(keystore)
                 : "export";
         name = Util.cleanupName(name);
         String format = conf.getString("export.format", "pem");
@@ -183,25 +185,29 @@ public class ExportDialog extends JDialog {
     private void exportPem(OutputStream stream, Key key,
             Certificate cert, Certificate chain[], char pwd[])
             throws Exception {
-        PEMWriter out = new PEMWriter(new OutputStreamWriter(stream, "UTF-8"));
-        if (key != null) {
-            if (pwd.length > 0)  {
-                JcePEMEncryptorBuilder builder = new JcePEMEncryptorBuilder("DES-EDE3-CBC");
-                builder.setSecureRandom(SecureRandom.getInstance("SHA1PRNG"));
-                PEMEncryptor pemEncryptor = builder.build(pwd);
-                out.writeObject(key, pemEncryptor);
-            } else {
-                out.writeObject(key);
+        try (Writer writer = new OutputStreamWriter(stream, "UTF-8")) {
+            JcaPEMWriter out = new JcaPEMWriter(writer);
+            if (key != null) {
+                if (pwd.length > 0)  {
+                    JcePEMEncryptorBuilder builder
+                            = new JcePEMEncryptorBuilder("DES-EDE3-CBC");
+                    builder.setSecureRandom(
+                            SecureRandom.getInstance("SHA1PRNG"));
+                    PEMEncryptor pemEncryptor = builder.build(pwd);
+                    out.writeObject(key, pemEncryptor);
+                } else {
+                    out.writeObject(key);
+                }
             }
-        }
-        if (chain != null) {
-            for (int i = 0; i < chain.length; ++i) {
-                out.writeObject(chain[i]);
+            if (chain != null) {
+                for (int i = 0; i < chain.length; ++i) {
+                    out.writeObject(chain[i]);
+                }
+            } else if (cert != null) {
+                out.writeObject(cert);
             }
-        } else if (cert != null) {
-            out.writeObject(cert);
+            out.flush();
         }
-        out.flush();
     }
 
     private void exportPkcs12(OutputStream out, String alias, Key key,
