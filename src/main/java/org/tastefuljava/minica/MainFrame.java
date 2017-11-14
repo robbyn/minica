@@ -145,6 +145,7 @@ public class MainFrame extends javax.swing.JFrame {
         changePwd.setEnabled(entry != null && entry.isKey());
         listChangePwd.setEnabled(entry != null && entry.isKey());
         generateCSR.setEnabled(entry != null && entry.isKey());
+        listGenerateCSR.setEnabled(entry != null && entry.isKey());
         sshEncode.setEnabled(cert != null);
         signItem.setEnabled(cert != null);
         export.setEnabled(cert != null);
@@ -264,6 +265,7 @@ public class MainFrame extends javax.swing.JFrame {
         listChangePwd = new javax.swing.JMenuItem();
         jSeparator2 = new javax.swing.JPopupMenu.Separator();
         listSshEncode = new javax.swing.JMenuItem();
+        listGenerateCSR = new javax.swing.JMenuItem();
         infoPanel = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         serialNumber = new javax.swing.JLabel();
@@ -359,6 +361,14 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
         listPopup.add(listSshEncode);
+
+        listGenerateCSR.setText("Generate CSR...");
+        listGenerateCSR.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                listGenerateCSRActionPerformed(evt);
+            }
+        });
+        listPopup.add(listGenerateCSR);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addWindowListener(new java.awt.event.WindowAdapter() {
@@ -1048,6 +1058,10 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_generateCSRActionPerformed
 
+    private void listGenerateCSRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listGenerateCSRActionPerformed
+        generateCSR.doClick();
+    }//GEN-LAST:event_listGenerateCSRActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu certMenu;
     private javax.swing.JMenuItem changePwd;
@@ -1075,6 +1089,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JMenuItem listChangePwd;
     private javax.swing.JMenuItem listDelete;
     private javax.swing.JMenuItem listExport;
+    private javax.swing.JMenuItem listGenerateCSR;
     private javax.swing.JPopupMenu listPopup;
     private javax.swing.JMenuItem listRename;
     private javax.swing.JScrollPane listScroll;
